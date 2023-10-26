@@ -6,8 +6,8 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="navy">#053B50</color>
-    <color name="blue">#176b87</color>
-    <color name="turquoise">#64ccc5</color>
-    <color name="white">#eeeeee</color>
+    <color name="colorBackground">#053B50</color>
+    <color name="colorPrimary">#176b87</color>
+    <color name="colorAccent">#64ccc5</color>
+    <color name="colorLightText">#eeeeee</color>
 </resources>
