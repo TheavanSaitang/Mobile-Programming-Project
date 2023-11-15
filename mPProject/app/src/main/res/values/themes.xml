@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.mPProject" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:background">@color/colorBackground</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorLightText</item>
+    </style>
+
+    <style name="Theme.mPProject" parent="Base.Theme.mPProject" />
+</resources>
