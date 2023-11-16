@@ -12,7 +12,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:background="@drawable/rounded_bg"
+        android:background="@drawable/rounded_bg_color_primary"
         android:hint="Search"
         android:textAlignment="viewStart"
         android:textColor="@color/colorLightText"
@@ -121,7 +121,15 @@
             android:textSize="20sp" />
 
     </LinearLayout>
-
+    <androidx.fragment.app.FragmentContainerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 
 

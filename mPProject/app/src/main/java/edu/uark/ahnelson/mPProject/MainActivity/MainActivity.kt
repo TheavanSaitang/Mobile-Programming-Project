@@ -2,12 +2,17 @@ package edu.uark.ahnelson.mPProject.MainActivity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.fragment.app.add
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
+import androidx.fragment.app.commit
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,9 +44,39 @@ class MainActivity : AppCompatActivity() {
         addGameButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
+        //creates a popupMenu on click of navButton
+        //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
         navButton.setOnClickListener{
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
+            val popupMenu = PopupMenu(this@MainActivity, navButton)
+
+            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                //selects specific menuItem option
+                when(menuItem.itemId) {
+                    //TODO MAKE THIS OPEN NEW GAME ACTIVITY
+                    R.id.addGame -> Toast.makeText(this, "Add Game", Toast.LENGTH_SHORT).show()
+
+                    //TODO DESIGN FRAGMENT FOR INPUTTING STEAM USER DETAILS
+                    R.id.importLibrary -> {
+                            supportFragmentManager.commit {
+                                setReorderingAllowed(true)
+                                add<SteamFragment>(R.id.fragment_container_view)
+                            }
+                    }
+
+                    //TODO ADD VERY VERY BASIC SETTINGS FRAGMENT
+                    R.id.settings -> Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                    else -> {
+                        //prints error if user somehow clicks unknown popup menu option
+                        //SHOULD NEVER HAPPEN
+                        Log.d("ERROR", "Invalid popup menu option selected")
+                    }
+                }
+                true
+            }
+
+            popupMenu.show()
         }
     }
 }
