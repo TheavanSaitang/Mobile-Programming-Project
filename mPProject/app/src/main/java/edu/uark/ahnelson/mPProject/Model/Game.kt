@@ -12,12 +12,12 @@ import androidx.room.PrimaryKey
         - completedDate     (long?)
         - system            (string)
     Best Effort should be made to acquire these, but they should not be necessary:
-        - art               (TODO: ??? nullable string or blob?)
+        - art               (string?)
         - description       (string?)
         - publisher         (string?)
         - publishDate       (long?)
     Users should be able to add the following to their game entries (WIP):
-        - photos            (TODO: ??? ArrayList? of images saved like Art)
+        - photos            (string? - subject to change)
         - notes             (string?)
         - rating            (int?)
  */
@@ -47,7 +47,6 @@ class Game(
     /*   Best Effort Game Requirements (scraping)   */
 
     // All games have cover art and look better with cover art, but users may choose not to define.
-    // TODO: Currently defined as string for filepath, may change.
     @ColumnInfo(name = "art") var art: String?,
 
     // All games have an official description published with the game, users may not care.
@@ -64,8 +63,7 @@ class Game(
     @ColumnInfo(name = "notes") var notes: String?,
 
     // All games can have screenshots or photos related to it that the user may want to save.
-    // TODO: Currently defined as an arraylist of strings for filepath, may change.
-    // Phillip - You cannot define ArrayList in a column, I changed it over to a string for now
+    // TODO: figure out how to store multiple photo paths, just one allowed for now
     @ColumnInfo(name = "photos") var photos: String?,
 
     // Users should be able to rate the game
