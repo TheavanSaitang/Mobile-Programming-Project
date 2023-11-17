@@ -57,11 +57,15 @@ class MainActivity : AppCompatActivity() {
                     //TODO MAKE THIS OPEN NEW GAME ACTIVITY
                     R.id.addGame -> Toast.makeText(this, "Add Game", Toast.LENGTH_SHORT).show()
 
-                    //TODO DESIGN FRAGMENT FOR INPUTTING STEAM USER DETAILS
                     R.id.importLibrary -> {
+                            val steamFragment = SteamFragment()
                             supportFragmentManager.commit {
-                                setReorderingAllowed(true)
-                                add<SteamFragment>(R.id.fragment_container_view)
+                                setCustomAnimations(
+                                    R.anim.fade_in,
+                                    R.anim.fade_out
+                                )
+                                replace(R.id.fragment_container_view, steamFragment, "steamFragment")
+                                addToBackStack("steamFragment")
                             }
                     }
 

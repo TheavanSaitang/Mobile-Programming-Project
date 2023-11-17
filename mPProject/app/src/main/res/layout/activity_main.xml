@@ -12,7 +12,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:background="@drawable/rounded_bg_color_primary"
+        android:background="@drawable/rounded_bg_color_primary_border"
         android:hint="Search"
         android:textAlignment="viewStart"
         android:textColor="@color/colorLightText"
@@ -32,7 +32,7 @@
         android:layout_marginEnd="10dp"
         android:text="="
         android:background="@drawable/circle_bg"
-        android:textSize="26sp"
+        android:textSize="20sp"
         android:typeface="monospace"
         android:padding="@dimen/small_padding"
         android:gravity="center"
@@ -85,8 +85,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="monospace"
+            android:padding="@dimen/medium_padding"
             android:text="Games"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <View
             android:layout_width="1dp"
@@ -101,8 +102,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="monospace"
+            android:padding="@dimen/medium_padding"
             android:text="Favorites"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <View
             android:layout_width="1dp"
@@ -117,8 +119,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="monospace"
+            android:padding="@dimen/medium_padding"
             android:text="Want to Play"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
     <androidx.fragment.app.FragmentContainerView
