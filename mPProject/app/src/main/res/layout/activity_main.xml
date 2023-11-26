@@ -31,7 +31,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:text="="
-        android:background="@drawable/circle_bg"
+        android:background="@drawable/circle_bg_color_primary_border"
         android:textSize="20sp"
         android:typeface="monospace"
         android:padding="@dimen/small_padding"
