@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import edu.uark.ahnelson.mPProject.Model.Game
 import edu.uark.ahnelson.mPProject.Model.GameRepository
+import kotlinx.coroutines.launch
 
 class GameListViewModel(private val repository: GameRepository) : ViewModel() {
 
@@ -14,6 +16,12 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allWords: LiveData<List<Game>> = repository.allGames.asLiveData()
+
+    fun update(game: Game) {
+        viewModelScope.launch {
+            repository.update(game)
+        }
+    }
 }
 
 class GameListViewModelFactory(private val repository: GameRepository) : ViewModelProvider.Factory {

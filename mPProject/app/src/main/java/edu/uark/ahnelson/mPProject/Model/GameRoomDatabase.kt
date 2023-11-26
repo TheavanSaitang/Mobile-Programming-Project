@@ -32,11 +32,11 @@ abstract class GameRoomDatabase : RoomDatabase() {
 
                     Log.d("Database","Attempting to create games...")
                     // Add sample games.
-                    val game = Game(
+                    var game = Game(
                         null,
                         "Portal",
-                        false,
-                        null,
+                        true,
+                        1226878024,
                         "PC",
                         null,
                         null,
@@ -45,6 +45,21 @@ abstract class GameRoomDatabase : RoomDatabase() {
                         "my first FPS - just use 'sv_cheats 1' and 'impulse 101'",
                         null,
                         5)
+                    gameDao.insert(game)
+
+                    game = Game(
+                        null,
+                        "Cthulhu Saves the World: Super Hyper Enhanced Championship Edition Alpha Diamond DX Plus Alpha FES HD – Premium Enhanced Game of the Year Collector's Edition (without Avatars!)",
+                        false,
+                        null,
+                        "PC",
+                        null,
+                        null,
+                        "Zeboyd Games",
+                        1311636424,
+                        "this is the title with the longest English name registered in the world. At least, it has a Guinness World Record..",
+                        null,
+                        4)
                     gameDao.insert(game)
                 }
             }
