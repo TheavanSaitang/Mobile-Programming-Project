@@ -51,8 +51,4 @@ class SteamFragment : Fragment() {
         }
         return root
     }
-
-
-
-
 }

@@ -4,35 +4,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/big_padding"
+    android:background="@drawable/rounded_bg_color_primary_border">
 
     <TextView
         android:id="@+id/tvTitle"
         style="@style/word_title"
-        android:layout_width="395dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium_padding"
+        android:layout_marginTop="@dimen/medium_padding"
+        android:layout_marginBottom="@dimen/medium_padding"
         android:gravity="fill_vertical"
         android:scrollIndicators="none"
         android:text="Game Title"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ratingBar"/>
 
     <TextView
         android:id="@+id/tvSystem"
         style="@style/word_title"
-        android:layout_width="395dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium_padding"
         android:paddingHorizontal="8dp"
         android:text="System"
         android:textAlignment="textStart"
@@ -43,6 +42,23 @@
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+
+    <me.zhanghai.android.materialratingbar.MaterialRatingBar
+        android:id="@+id/ratingBar"
+        style="@style/Widget.MaterialRatingBar.RatingBar"
+        app:mrb_progressBackgroundTint="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="@dimen/medium_padding"
+        android:layout_marginEnd="@dimen/medium_padding"
+        android:background="@color/colorPrimary"
+        android:gravity="top"
+        app:layout_constraintBottom_toTopOf="@+id/tvSystem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
