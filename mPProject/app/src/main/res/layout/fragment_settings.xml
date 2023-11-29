@@ -6,7 +6,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:context="MainActivity.MainActivity"
-
+    android:background="@android:color/transparent"
     >
     <LinearLayout
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
             android:id="@+id/titleLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Steam Login"
+            android:text="Settings"
             android:textAlignment="center"
             android:textColor="@color/colorLightText"
             android:textSize="26sp"
@@ -30,18 +30,6 @@
             android:padding="@dimen/small_padding"
             android:background="@drawable/rounded_bg_color_primary"/>
 
-        <EditText
-            android:id="@+id/inputUsername"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_margin="@dimen/big_padding"
-            android:background="@drawable/rounded_bg_color_accent_border"
-            android:hint="Steam ID"
-            android:textAlignment="viewStart"
-            android:textColor="@color/colorLightText"
-            android:textSize="26sp"
-            android:typeface="monospace"
-            android:padding="@dimen/small_padding"/>
         <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -70,28 +58,6 @@
                 android:textColor="@color/colorDarkText" />
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DISCLAIMER"
-            android:textSize = "12sp"
-            android:background = "@color/colorPrimary"
-            android:typeface = "monospace"
-            android:layout_marginTop = "@dimen/big_padding"
-            android:gravity = "center"/>
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="46sp"
-            android:layout_marginBottom="@dimen/big_padding"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:text="Profile must be made public in order to see complete functionality"
-            android:textSize="12sp"
-            android:typeface="monospace" />
 
 
     </LinearLayout>

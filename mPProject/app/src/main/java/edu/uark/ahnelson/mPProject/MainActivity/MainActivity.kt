@@ -76,7 +76,17 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     //TODO ADD VERY VERY BASIC SETTINGS FRAGMENT
-                    R.id.settings -> Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                    R.id.settings -> {
+                        val settingsFragment = SettingsFragment()
+                        supportFragmentManager.commit {
+                            setCustomAnimations(
+                                R.anim.fade_in,
+                                R.anim.fade_out
+                            )
+                            replace(R.id.fragment_container_view, settingsFragment, "settingsFragment")
+                            addToBackStack("settingsFragment")
+                        }
+                    }
                     else -> {
                         //prints error if user somehow clicks unknown popup menu option
                         //SHOULD NEVER HAPPEN
