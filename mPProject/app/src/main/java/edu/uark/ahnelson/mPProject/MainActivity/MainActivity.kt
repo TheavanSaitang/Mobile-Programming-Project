@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        // todo: set up NewEditGameActivity intent for floating action button ( add a game )
+        //TODO make fab sort
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()

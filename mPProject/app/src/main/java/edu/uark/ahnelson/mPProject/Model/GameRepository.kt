@@ -85,13 +85,14 @@ class GameRepository(private val gameDao: GameDao) {
     private suspend fun parseSteamGameInfo(APIReturn: String){
         val objectJSON = JSONObject(APIReturn)
             .getJSONObject("response").getJSONArray("apps").getJSONObject(0)
-        val name = objectJSON.getString("name")
+        val title = objectJSON.getString("name")
         val icon = ""
         if(objectJSON.has("icon")) {
             val icon = objectJSON.getString("icon")
         }
-        insert(Game(null, name, false, 0, "PC", icon, "", "", 0, "", "", 0))
-
+        if(!checkGame(title)) {
+            insert(Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0))
+        }
     }
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
@@ -122,6 +123,12 @@ class GameRepository(private val gameDao: GameDao) {
     @WorkerThread
     suspend fun deleteGame(game: Game) {
         gameDao.deleteGame(game.id)
+    }
+
+    @Suppress
+    @WorkerThread
+    suspend fun checkGame(title: String): Boolean {
+        return gameDao.getIfGameExists(title) != null
     }
 }
 

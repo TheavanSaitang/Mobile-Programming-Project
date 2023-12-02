@@ -21,6 +21,9 @@ interface GameDao {
     @Query("SELECT * FROM game_table WHERE id=:id")
     fun getGameNotLive(id:Int): Game
 
+    //check if a single game exists with the given name
+    @Query("SELECT * FROM game_table WHERE title=:title")
+    fun getIfGameExists(title:String): Boolean
     //Insert a single game
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(game: Game)
