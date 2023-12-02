@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="170d47be-3b0d-4b6e-8cd2-18b17ff9010e" name="Changes" comment="" />
+    <list default="true" id="170d47be-3b0d-4b6e-8cd2-18b17ff9010e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/mPProject/app/src/main/java/edu/uark/ahnelson/mPProject/GameActivity/GameActivity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mPProject/app/src/main/java/edu/uark/ahnelson/mPProject/GameActivity/GameViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mPProject/app/src/main/res/layout/activity_game.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/app/src/main/java/edu/uark/ahnelson/mPProject/MainActivity/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/app/src/main/java/edu/uark/ahnelson/mPProject/MainActivity/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mPProject/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mPProject/app/src/main/res/values/styles.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,7 +34,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "/Users/snail/Documents/GitHub/Mobile-Programming-Project"
+    "last_opened_file_path": "Z:/CSCE 4623 - Mobile Programming/MP Project/Mobile-Programming-Project"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

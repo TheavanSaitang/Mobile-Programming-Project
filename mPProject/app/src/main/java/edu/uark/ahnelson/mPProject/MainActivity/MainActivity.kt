@@ -17,6 +17,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
+import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
+import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
+
 // import edu.uark.ahnelson.mPProject.NewEditGameActivity.NewEditGameActivity.Companion.EXTRA_ID
 
 
@@ -32,10 +35,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
-        addGameButton.setOnClickListener{
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        }
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -47,7 +46,10 @@ class MainActivity : AppCompatActivity() {
                 //selects specific menuItem option
                 when(menuItem.itemId) {
                     //TODO MAKE THIS OPEN NEW GAME ACTIVITY
-                    R.id.addGame -> Toast.makeText(this, "Add Game", Toast.LENGTH_SHORT).show()
+                    R.id.addGame -> {
+                        val intent = Intent(this@MainActivity, GameActivity::class.java)
+                        startGameActivity.launch(intent)
+                    }
 
                     R.id.importLibrary -> {
                             val steamFragment = SteamFragment()
@@ -90,9 +92,8 @@ class MainActivity : AppCompatActivity() {
         //TODO make fab sort
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-//            val intent = Intent(this@MainActivity, NewEditGameActivity::class.java)
-//            startNewGameActivity.launch(intent)
+            val intent = Intent(this@MainActivity, GameActivity::class.java)
+            startGameActivity.launch(intent)
         }
 
         // Set up RecyclerView for games list
@@ -146,16 +147,14 @@ class MainActivity : AppCompatActivity() {
         gameListViewModel.getSteamGames("76561198301339924")
     }
     private fun gameItemClicked(id: Int){
-        // todo: set up NewEditGameActivity intent when clicking a game tile ( view/edit game )
-        Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        // val intent = Intent(this@MainActivity, NewEditGameTaskActivity::class.java)
-        // intent.putExtra(EXTRA_ID,id)
-        // startNewGameActivity.launch(intent)
+        val intent = Intent(this@MainActivity, GameActivity::class.java)
+        intent.putExtra(EXTRA_ID,id)
+        startGameActivity.launch(intent)
     }
 
     // This is our ActivityResultContracts value that defines the behavior of our application when the MainActivity has finished.
     // Should be called above in gameItemClicked.
-    val startNewGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+    val startGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
         if(result.resultCode== Activity.RESULT_OK){
             //Note that all we are doing is logging that we completed

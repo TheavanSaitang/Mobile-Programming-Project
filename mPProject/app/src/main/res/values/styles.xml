@@ -16,6 +16,11 @@
         <item name="android:textColor">@color/colorLightText</item>
         <item name="android:gravity">center</item>
     </style>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/colorLightText</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
     <!-- The default font for RecyclerView items is too small.
     The margin is a simple delimiter between the words. -->
     <style name="word_title">
