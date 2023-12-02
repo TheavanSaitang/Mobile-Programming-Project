@@ -38,12 +38,12 @@ abstract class GameRoomDatabase : RoomDatabase() {
                         true,
                         1226878024,
                         "PC",
-                        null,
+                        "",
                         null,
                         "Valve",
                         1191974400,
                         "my first FPS - just use 'sv_cheats 1' and 'impulse 101'",
-                        null,
+                        "",
                         5)
                     gameDao.insert(game)
 
@@ -53,12 +53,12 @@ abstract class GameRoomDatabase : RoomDatabase() {
                         false,
                         null,
                         "PC",
-                        null,
+                        "",
                         null,
                         "Zeboyd Games",
                         1311636424,
                         "this is the title with the longest English name registered in the world. At least, it has a Guinness World Record..",
-                        null,
+                        "",
                         4)
                     gameDao.insert(game)
                 }

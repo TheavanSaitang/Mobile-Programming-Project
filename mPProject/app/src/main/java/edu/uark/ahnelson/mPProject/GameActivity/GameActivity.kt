@@ -36,6 +36,8 @@ class GameActivity : AppCompatActivity() {
 
     private var initialArt: String = ""
     private var initialPhotos: String = ""
+    private var art: String = ""
+    private var photos: String = ""
 
 
     private val gameViewModel: GameViewModel by viewModels {
@@ -63,7 +65,7 @@ class GameActivity : AppCompatActivity() {
         }
         gameViewModel.curGame.observe(this) { game ->
             game?.let {
-                if(game.art != null) {
+                if(game.art != "") {
                     imGame.setImageBitmap(game.art?.let { it1 -> getPic(it1, imGame.width, imGame.height) })
                     initialArt = game.art!!
                 }
@@ -88,7 +90,7 @@ class GameActivity : AppCompatActivity() {
                     cbComplete.setChecked(game.completed)
                     // STAR BAR
                     etNotes.setText(game.notes)
-                    if(game.photos != null) {
+                    if(game.photos != "") {
                         imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
                         initialPhotos = game.photos!!
                     }
@@ -101,8 +103,6 @@ class GameActivity : AppCompatActivity() {
                 CoroutineScope(SupervisorJob()).launch {
                     var com: Long?
                     var pub: Long?
-                    var art: String
-                    var photos: String
 
                     if (etCompleteDate.text.toString() != "") {
                         com = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
@@ -116,14 +116,12 @@ class GameActivity : AppCompatActivity() {
                     } else {
                         pub = null
                     }
-//                    if((imGame.drawable as BitmapDrawable).bitmap == initialArt) {
-//                        art =
-//                    } else {
-//                        art =
-//                    }
-//                    if((imPictures.drawable as BitmapDrawable).bitmap == initialPhotos) {
-//                        photos = ""
-//                    }
+                    if(art == initialArt) {
+                        art = ""
+                    }
+                    if(photos == initialPhotos) {
+                        photos = ""
+                    }
 
                     if (id == -1) {
                         gameViewModel.insert(
@@ -133,14 +131,12 @@ class GameActivity : AppCompatActivity() {
                                 cbComplete.isChecked,
                                 com,
                                 etSystem.text.toString(),
-//                            imGame.toString(),
-                                "Sussy",
+                                art,
                                 etDescription.text.toString(),
                                 etPublisher.text.toString(),
                                 pub,
                                 etNotes.text.toString(),
-//                            imPictures.toString(),
-                                "I'm so sorry",
+                                photos,
                                 5
                             )
                         )
@@ -151,12 +147,12 @@ class GameActivity : AppCompatActivity() {
                             updatedGame.completed = cbComplete.isChecked
                             updatedGame.completedDate = com
                             updatedGame.system = etSystem.text.toString()
-//                        updatedGame.art = imGame.toString()
+                            updatedGame.art = art
                             updatedGame.description = etDescription.text.toString()
                             updatedGame.publisher = etPublisher.text.toString()
                             updatedGame.publishDate = pub
                             updatedGame.notes = etNotes.text.toString()
-//                        updatedGame.photos = imPictures.toString()
+                            updatedGame.photos = photos
                             updatedGame.rating = 5
                             gameViewModel.update(updatedGame)
                         }
@@ -178,7 +174,6 @@ class GameActivity : AppCompatActivity() {
         BitmapFactory.decodeFile(photoPath, bmOptions)
         val photoW = bmOptions.outWidth
         val photoH = bmOptions.outHeight
-        val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
         val targetH: Int = h
         // Determine how much to scale down the image
         val scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH))
