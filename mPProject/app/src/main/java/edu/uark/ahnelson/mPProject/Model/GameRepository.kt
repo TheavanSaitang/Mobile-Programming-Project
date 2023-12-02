@@ -11,6 +11,9 @@ class GameRepository(private val gameDao: GameDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allGames: Flow<List<Game>> = gameDao.getAlphabetizedGames()
+    val completedGames: Flow<List<Game>> = gameDao.getCompletedGames(true)
+    val incompleteGames: Flow<List<Game>> = gameDao.getCompletedGames(false)
+
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.

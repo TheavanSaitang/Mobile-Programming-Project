@@ -32,20 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //Phillip - Temporary action definitions for buttons, this will work until we get the game
-        //data displayed
-        val gamesButton = findViewById<Button>(R.id.btnGames)
-        gamesButton.setOnClickListener{
-           Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        }
-        val favoritesButton = findViewById<Button>(R.id.btnFavorites)
-        favoritesButton.setOnClickListener{
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        }
-        val wantToPlayButton = findViewById<Button>(R.id.btnWantToPlay)
-        wantToPlayButton.setOnClickListener{
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        }
         val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
         addGameButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
@@ -117,12 +103,41 @@ class MainActivity : AppCompatActivity() {
         // Add an observer on the LiveData returned by getAlphabetizedWords.
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
-        gameListViewModel.allWords.observe( this) { words ->
+        gameListViewModel.allGames.observe( this) { words ->
             // Update the cached copy of the words in the adapter.
             words.let {
                 adapter.submitList(it)
             }
         }
+
+        //Phillip - Temporary action definitions for buttons, this will work until we get the game
+        //data displayed
+        val gamesButton = findViewById<Button>(R.id.btnGames)
+        gamesButton.setOnClickListener{
+            gameListViewModel.allGames.observe( this) { words ->
+                // Update the cached copy of the words in the adapter.
+                words.let {
+                    adapter.submitList(it)
+                }
+            }
+        }
+        val favoritesButton = findViewById<Button>(R.id.btnFavorites)
+        favoritesButton.setOnClickListener{
+            gameListViewModel.completedGames.observe( this) { words ->
+                // Update the cached copy of the words in the adapter.
+                words.let {
+                    adapter.submitList(it)
+                }
+            }
+        }
+        val wantToPlayButton = findViewById<Button>(R.id.btnWantToPlay)
+        wantToPlayButton.setOnClickListener{
+            gameListViewModel.incompleteGames.observe( this) { words ->
+                // Update the cached copy of the words in the adapter.
+                words.let {
+                    adapter.submitList(it)
+                }
+            }        }
     }
 
     private fun gameItemClicked(id: Int){

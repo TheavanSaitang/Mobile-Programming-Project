@@ -13,6 +13,9 @@ interface GameDao {
     @Query("SELECT * FROM game_table ORDER BY title ASC")
     fun getAlphabetizedGames(): Flow<List<Game>>
 
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY title ASC")
+    fun getCompletedGames(isCompleted:Boolean): Flow<List<Game>>
+
     //Get a single game with a given id
     @Query("SELECT * FROM game_table WHERE id=:id")
     fun getGame(id:Int): Flow<Game>

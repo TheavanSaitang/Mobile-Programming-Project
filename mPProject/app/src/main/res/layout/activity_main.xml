@@ -30,7 +30,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:text="="
+        android:text="≡"
         android:background="@drawable/circle_bg_color_primary_border"
         android:textSize="20sp"
         android:typeface="monospace"
@@ -86,7 +86,7 @@
             android:layout_weight="1"
             android:fontFamily="monospace"
             android:padding="@dimen/medium_padding"
-            android:text="Games"
+            android:text="All Games"
             android:textSize="16sp" />
 
         <View
@@ -103,7 +103,7 @@
             android:layout_weight="1"
             android:fontFamily="monospace"
             android:padding="@dimen/medium_padding"
-            android:text="Favorites"
+            android:text="Completed"
             android:textSize="16sp" />
 
         <View
@@ -120,7 +120,7 @@
             android:layout_weight="1"
             android:fontFamily="monospace"
             android:padding="@dimen/medium_padding"
-            android:text="Want to Play"
+            android:text="Incompleted"
             android:textSize="16sp" />
 
     </LinearLayout>
