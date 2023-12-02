@@ -16,7 +16,9 @@
         android:theme="@style/Base.Theme.mPProject"
         tools:targetApi="34">
 
-
+        <activity
+            android:name=".GameActivity.GameActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity.MainActivity"
             android:exported="true"

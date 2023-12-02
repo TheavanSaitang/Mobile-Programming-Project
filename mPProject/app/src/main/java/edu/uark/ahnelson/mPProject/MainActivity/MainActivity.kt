@@ -16,9 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.fragment.app.add
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
+import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
-// import edu.uark.ahnelson.mPProject.NewEditGameActivity.NewEditGameActivity.Companion.EXTRA_ID
+import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         //data displayed
         val gamesButton = findViewById<Button>(R.id.btnGames)
         gamesButton.setOnClickListener{
-           Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
         val favoritesButton = findViewById<Button>(R.id.btnFavorites)
         favoritesButton.setOnClickListener{
@@ -47,10 +48,7 @@ class MainActivity : AppCompatActivity() {
         wantToPlayButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
-        val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
-        addGameButton.setOnClickListener{
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        }
+
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -90,12 +88,11 @@ class MainActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        // todo: set up NewEditGameActivity intent for floating action button ( add a game )
+        // GameActivity intent for floating action button ( add a game )
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-//            val intent = Intent(this@MainActivity, NewEditGameActivity::class.java)
-//            startNewGameActivity.launch(intent)
+            val intent = Intent(this@MainActivity, GameActivity::class.java)
+            startGameActivity.launch(intent)
         }
 
         // Set up RecyclerView for games list
@@ -117,16 +114,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun gameItemClicked(id: Int){
-        // todo: set up NewEditGameActivity intent when clicking a game tile ( view/edit game )
-        Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
-        // val intent = Intent(this@MainActivity, NewEditGameTaskActivity::class.java)
-        // intent.putExtra(EXTRA_ID,id)
-        // startNewGameActivity.launch(intent)
+        val intent = Intent(this@MainActivity, GameActivity::class.java)
+        intent.putExtra(EXTRA_ID,id)
+        startGameActivity.launch(intent)
     }
 
     // This is our ActivityResultContracts value that defines the behavior of our application when the MainActivity has finished.
     // Should be called above in gameItemClicked.
-    val startNewGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+    val startGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
         if(result.resultCode== Activity.RESULT_OK){
             //Note that all we are doing is logging that we completed
