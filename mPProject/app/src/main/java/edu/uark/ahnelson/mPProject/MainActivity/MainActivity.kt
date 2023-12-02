@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        // todo: set up NewEditGameActivity intent for floating action button ( add a game )
+        //TODO make fab sort
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@MainActivity, GameActivity::class.java)
