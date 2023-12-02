@@ -22,6 +22,11 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
             repository.update(game)
         }
     }
+    fun getSteamGames(userId: String) {
+        viewModelScope.launch {
+            repository.getSteamGames(userId)
+        }
+    }
 }
 
 class GameListViewModelFactory(private val repository: GameRepository) : ViewModelProvider.Factory {

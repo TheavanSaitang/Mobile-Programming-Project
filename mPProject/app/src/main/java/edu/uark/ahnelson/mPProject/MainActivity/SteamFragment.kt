@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import edu.uark.ahnelson.mPProject.R
 import androidx.appcompat.app.AppCompatActivity
@@ -21,8 +22,9 @@ import androidx.fragment.app.commit
 
 class SteamFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.fragment_steam_login, container, false)
-
+        val inputUsername = root.findViewById<EditText>(R.id.inputUsername)
         //defines exit animation
         val exitAnimation = AnimationUtils.loadAnimation(activity, R.anim.fade_out)
         //exitAnimation behavior
@@ -47,6 +49,8 @@ class SteamFragment : Fragment() {
         //TODO MAKE SUBMIT ACTUALLY SUBMIT TO SOMEWHERE
         val buttonSubmit = root.findViewById<Button>(R.id.btnSubmit)
         buttonSubmit.setOnClickListener {
+            val act: MainActivity = activity as MainActivity
+            act.getSteamInfo(inputUsername.text.toString())
             root.startAnimation(exitAnimation)
         }
         return root
