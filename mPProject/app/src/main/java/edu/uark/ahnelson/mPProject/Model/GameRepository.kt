@@ -37,7 +37,8 @@ class GameRepository(private val gameDao: GameDao) {
     private val client = OkHttpClient()
     private val APIKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
 
-    //connects to Steam API, gets all app id's from a user with a specified userId
+    //connects to Steam API, gets all app id's from a user with a specified userId, then calls a function
+    //to parse them
     suspend fun getSteamGames(userId: String) = withContext(Dispatchers.IO) {
 
         val request = Request.Builder()
@@ -49,11 +50,12 @@ class GameRepository(private val gameDao: GameDao) {
             for ((name, value) in response.headers) {
                 println("$name: $value")
             }
-            convertSteamGames(response.body!!.string())
+            parseSteamGames(response.body!!.string())
 
         }
     }
-    private fun convertSteamGames(APIReturn: String){
+    //parses SteamGames JSON for usable individual games, then calls getSteamGameInfo with that
+    private suspend fun parseSteamGames(APIReturn: String){
         val gamesArray = JSONObject(APIReturn)
             .getJSONObject("response").getJSONArray("games")
         //getSteamGameInfo(gamesArray.getJSONObject(0).getString("appid"))
@@ -66,7 +68,8 @@ class GameRepository(private val gameDao: GameDao) {
         }
         Log.d("Test", "Made it!")
     }
-    fun getSteamGameInfo(appId:String) {
+    //gets appId and then calls steamAPI for more info, calls parseSteamGameInfo to parse it
+    private suspend fun getSteamGameInfo(appId:String) {
         val request = Request.Builder()
             .url("https://api.steampowered.com/ICommunityService/GetApps/v1/?key=FCBCDE0D333F3FA53CE2A1AB19FCCE52&appids%5B0%5D=$appId")
             .build()
@@ -75,19 +78,18 @@ class GameRepository(private val gameDao: GameDao) {
             for((name, value) in response.headers) {
                 println("$name: $value")
             }
-            parseGameInfo(response.body!!.string())
+            parseSteamGameInfo(response.body!!.string())
         }
     }
-    fun parseGameInfo(APIReturn: String){
+    //parses game Info which is passed in, then adds the game to the database
+    private suspend fun parseSteamGameInfo(APIReturn: String){
         val objectJSON = JSONObject(APIReturn)
             .getJSONObject("response").getJSONArray("apps").getJSONObject(0)
         val name = objectJSON.getString("name")
         val icon = objectJSON.getString("icon")
-        runBlocking{
-            launch{
+
                 insert(Game(null, name, false, 0, "PC", icon, "", "", 0, "", "", 0))
-            }
-        }
+
     }
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
