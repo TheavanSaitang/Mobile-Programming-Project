@@ -89,9 +89,11 @@ class GameRepository(private val gameDao: GameDao) {
         val objectJSON = JSONObject(APIReturn)
             .getJSONObject("response").getJSONArray("apps").getJSONObject(0)
         val name = objectJSON.getString("name")
-        val icon = objectJSON.getString("icon")
-
-                insert(Game(null, name, false, 0, "PC", icon, "", "", 0, "", "", 0))
+        val icon = ""
+        if(objectJSON.has("icon")) {
+            val icon = objectJSON.getString("icon")
+        }
+        insert(Game(null, name, false, 0, "PC", icon, "", "", 0, "", "", 0))
 
     }
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
