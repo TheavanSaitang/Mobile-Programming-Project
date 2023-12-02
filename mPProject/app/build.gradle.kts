@@ -81,4 +81,7 @@ dependencies {
 
     //StarBar
     implementation("me.zhanghai.android.materialratingbar:library:1.4.0")
+
+    //HTTP Requests
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
