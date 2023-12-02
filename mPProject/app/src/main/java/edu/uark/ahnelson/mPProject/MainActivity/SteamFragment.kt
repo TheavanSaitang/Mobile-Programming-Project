@@ -46,7 +46,6 @@ class SteamFragment : Fragment() {
             //runs exitAnimation, once animation ends the fragment is removed from the backstack
             root.startAnimation(exitAnimation)
         }
-        //TODO MAKE SUBMIT ACTUALLY SUBMIT TO SOMEWHERE
         val buttonSubmit = root.findViewById<Button>(R.id.btnSubmit)
         buttonSubmit.setOnClickListener {
             val act: MainActivity = activity as MainActivity

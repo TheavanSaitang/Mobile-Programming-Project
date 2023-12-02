@@ -34,7 +34,7 @@ class GameListAdapter(val itemClicked: (id: Int) -> Unit)
             itemClicked(it.tag as Int)
         }
     }
-
+    //TODO make starbar usable from recyclerview
     class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val gameTitleView: TextView = itemView.findViewById(R.id.tvTitle)
         private val gameSystemView:TextView = itemView.findViewById(R.id.tvSystem)
