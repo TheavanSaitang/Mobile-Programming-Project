@@ -38,7 +38,7 @@
             android:background="@drawable/rounded_bg_color_accent_border"
             android:hint="Steam ID"
             android:textAlignment="viewStart"
-            android:textColor="@color/colorLightText"
+            android:textColor="@color/colorDarkText"
             android:textSize="26sp"
             android:typeface="monospace"
             android:padding="@dimen/small_padding"/>
