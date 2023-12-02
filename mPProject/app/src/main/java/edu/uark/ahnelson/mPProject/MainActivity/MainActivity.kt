@@ -67,6 +67,8 @@ class MainActivity : AppCompatActivity() {
                         supportFragmentManager.commit {
                             setCustomAnimations(
                                 R.anim.fade_in,
+                                R.anim.fade_out,
+                                R.anim.fade_in,
                                 R.anim.fade_out
                             )
                             replace(R.id.fragment_container_view, settingsFragment, "settingsFragment")
@@ -139,7 +141,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }        }
     }
-
+    //called by SteamFragment, initiates any steam stuff
+    fun getSteamInfo(userId: String){
+        gameListViewModel.getSteamGames("76561198301339924")
+    }
     private fun gameItemClicked(id: Int){
         // todo: set up NewEditGameActivity intent when clicking a game tile ( view/edit game )
         Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
@@ -159,4 +164,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
 
