@@ -67,6 +67,6 @@ class Game(
     @ColumnInfo(name = "photos") var photos: String?,
 
     // Users should be able to rate the game
-    @ColumnInfo(name = "rating") var rating: Int?
+    @ColumnInfo(name = "rating") var rating: Float?
 )
 

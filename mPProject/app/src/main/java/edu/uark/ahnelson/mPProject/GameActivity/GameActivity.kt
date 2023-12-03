@@ -2,13 +2,13 @@ package edu.uark.ahnelson.mPProject.GameActivity
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.icu.text.DateFormat
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RatingBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import edu.uark.ahnelson.mPProject.GamesApplication
@@ -30,7 +30,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var etDescription: EditText
     private lateinit var etCompleteDate: EditText
     private lateinit var cbComplete: CheckBox
-    // STAR BAR API!
+    private lateinit var ratingBar: RatingBar
     private lateinit var etNotes: EditText
     private lateinit var imPictures: ImageView
 
@@ -55,7 +55,7 @@ class GameActivity : AppCompatActivity() {
         etDescription = findViewById(R.id.textDescription)
         etCompleteDate = findViewById(R.id.dateCompletion)
         cbComplete = findViewById(R.id.checkCompletion)
-        // STAR BAR!!!!
+        ratingBar = findViewById(R.id.ratingBarShow)
         etNotes = findViewById(R.id.textNotes)
         imPictures = findViewById(R.id.imagePictures)
 
@@ -88,7 +88,7 @@ class GameActivity : AppCompatActivity() {
                         )
                     }
                     cbComplete.setChecked(game.completed)
-                    // STAR BAR
+                    ratingBar.rating = game.rating!!
                     etNotes.setText(game.notes)
                     if(game.photos != "") {
                         imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
@@ -137,7 +137,7 @@ class GameActivity : AppCompatActivity() {
                                 pub,
                                 etNotes.text.toString(),
                                 photos,
-                                5
+                                ratingBar.rating
                             )
                         )
                     } else {
@@ -153,7 +153,7 @@ class GameActivity : AppCompatActivity() {
                             updatedGame.publishDate = pub
                             updatedGame.notes = etNotes.text.toString()
                             updatedGame.photos = photos
-                            updatedGame.rating = 5
+                            updatedGame.rating = ratingBar.rating
                             gameViewModel.update(updatedGame)
                         }
                     }
