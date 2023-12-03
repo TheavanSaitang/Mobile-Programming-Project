@@ -6,23 +6,18 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.fragment.app.add
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
 import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
 import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
-
-// import edu.uark.ahnelson.mPProject.NewEditGameActivity.NewEditGameActivity.Companion.EXTRA_ID
-
-
 class MainActivity : AppCompatActivity() {
 
     //This instantiates the viewModel instance
@@ -34,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -63,9 +57,9 @@ class MainActivity : AppCompatActivity() {
                             }
                     }
 
-                    //TODO ADD VERY VERY BASIC SETTINGS FRAGMENT
+                    //very basic settings fragment
                     R.id.settings -> {
-                        val settingsFragment = SettingsFragment()
+                        val settingsFragment = LoadingFragment()
                         supportFragmentManager.commit {
                             setCustomAnimations(
                                 R.anim.fade_in,
@@ -75,6 +69,20 @@ class MainActivity : AppCompatActivity() {
                             )
                             replace(R.id.fragment_container_view, settingsFragment, "settingsFragment")
                             addToBackStack("settingsFragment")
+                        }
+                    }
+
+                    R.id.clearDatabase -> {
+                        val permissionFragment = PermissionFragment()
+                        supportFragmentManager.commit {
+                            setCustomAnimations(
+                                R.anim.fade_in,
+                                R.anim.fade_out,
+                                R.anim.fade_in,
+                                R.anim.fade_out
+                            )
+                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment]")
+                            addToBackStack("permissionFragment")
                         }
                     }
                     else -> {
@@ -140,11 +148,36 @@ class MainActivity : AppCompatActivity() {
                 words.let {
                     adapter.submitList(it)
                 }
-            }        }
+            }
+        }
+        //if "loading" is true, use loadingFragment
+        //else, close steamFragment & loadingFragment
+        gameListViewModel.loading.observe(this) { loading ->
+            if(loading)
+            {
+                val loadingFragment = LoadingFragment()
+                supportFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                    )
+                    replace(R.id.fragment_container_view, loadingFragment, "loadingFragment")
+                    addToBackStack("loadingFragment")
+                }
+            }
+            else
+            {
+                supportFragmentManager.popBackStack("steamFragment", POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
+            }
+        }
     }
     //called by SteamFragment, initiates any steam stuff
     fun getSteamInfo(userId: String){
-        gameListViewModel.getSteamGames("76561198301339924")
+        gameListViewModel.getSteamGames("76561198044143028")
+    }
+    fun deleteAll(){
+        gameListViewModel.deleteAll()
     }
     private fun gameItemClicked(id: Int){
         val intent = Intent(this@MainActivity, GameActivity::class.java)
@@ -154,7 +187,7 @@ class MainActivity : AppCompatActivity() {
 
     // This is our ActivityResultContracts value that defines the behavior of our application when the MainActivity has finished.
     // Should be called above in gameItemClicked.
-    val startGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+    private val startGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
         if(result.resultCode== Activity.RESULT_OK){
             //Note that all we are doing is logging that we completed
@@ -163,5 +196,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
 

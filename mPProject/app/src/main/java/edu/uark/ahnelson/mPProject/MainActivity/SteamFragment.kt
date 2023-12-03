@@ -24,6 +24,7 @@ class SteamFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.fragment_steam_login, container, false)
+        val parentActivity = activity as MainActivity
         val inputUsername = root.findViewById<EditText>(R.id.inputUsername)
         //defines exit animation
         val exitAnimation = AnimationUtils.loadAnimation(activity, R.anim.fade_out)
@@ -34,7 +35,7 @@ class SteamFragment : Fragment() {
             }
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
-                activity?.supportFragmentManager?.popBackStack("steamFragment", POP_BACK_STACK_INCLUSIVE)
+                parentActivity.supportFragmentManager.popBackStack("steamFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
             override fun onAnimationStart(animation: Animation?) {
@@ -48,8 +49,7 @@ class SteamFragment : Fragment() {
         }
         val buttonSubmit = root.findViewById<Button>(R.id.btnSubmit)
         buttonSubmit.setOnClickListener {
-            val act: MainActivity = activity as MainActivity
-            act.getSteamInfo(inputUsername.text.toString())
+            parentActivity.getSteamInfo(inputUsername.text.toString())
             root.startAnimation(exitAnimation)
         }
         return root

@@ -1,14 +1,10 @@
 package edu.uark.ahnelson.mPProject.Model
 
-import android.os.AsyncTask
 import android.util.Log
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
 import okhttp3.MediaType.Companion.toMediaType
@@ -17,7 +13,6 @@ import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
-import org.json.JSONArray
 import org.json.JSONObject
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
@@ -29,7 +24,7 @@ class GameRepository(private val gameDao: GameDao) {
     val allGames: Flow<List<Game>> = gameDao.getAlphabetizedGames()
     val completedGames: Flow<List<Game>> = gameDao.getCompletedGames(true)
     val incompleteGames: Flow<List<Game>> = gameDao.getCompletedGames(false)
-
+    var loading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -66,23 +61,34 @@ class GameRepository(private val gameDao: GameDao) {
 
         }
     }
-    //parses SteamGames JSON for usable individual games, then calls getSteamGameInfo with that
-    private suspend fun parseSteamGames(APIReturn: String){
-        val gamesArray = JSONObject(APIReturn)
+    //parses SteamGames JSON for usable individual games, then calls getSteamGameInfo with that,
+    //puts the return into an ArrayList, and then adds those games to the repository
+    private suspend fun parseSteamGames(apiReturn: String){
+        val gamesArray = JSONObject(apiReturn)
             .getJSONObject("response").getJSONArray("games")
+        val gamesToAdd = arrayListOf<Game>()
+        Log.d("Made", "It")
         //getSteamGameInfo(gamesArray.getJSONObject(0).getString("appid"))
         for(i in 0 until gamesArray.length())
         {
             //Log.d("Database", gamesArray.getJSONObject(i).get("appid").toString())
-            Log.d("Debug", i.toString())
-            Log.d("Debug", gamesArray.length().toString())
-            getSteamGameInfo(gamesArray.getJSONObject(i).getString("appid"))
+            getSteamGameInfo(gamesArray.getJSONObject(i).getString("appid"))?.let {
+                gamesToAdd.add(
+                    it
+                )
+            }
         }
+        for(i in 0 until gamesToAdd.size)
+        {
+            insert(gamesToAdd[i])
+        }
+        loading.postValue(false)
         Log.d("Test", "Made it!")
     }
+
     //gets appId and then calls steamAPI for more info, calls parseSteamGameInfo to parse it
-    private suspend fun getSteamGameInfo(appId:String) {
-        val request = Builder()
+    private suspend fun getSteamGameInfo(appId:String): Game? {
+        val request = Request.Builder()
             .url("https://api.steampowered.com/ICommunityService/GetApps/v1/?key=FCBCDE0D333F3FA53CE2A1AB19FCCE52&appids%5B0%5D=$appId")
             .build()
         client.newCall(request).execute().use {response ->
@@ -90,21 +96,23 @@ class GameRepository(private val gameDao: GameDao) {
             for((name, value) in response.headers) {
                 println("$name: $value")
             }
-            parseSteamGameInfo(response.body!!.string())
+            return parseSteamGameInfo(response.body!!.string())
         }
     }
+
     //parses game Info which is passed in, then adds the game to the database
-    private suspend fun parseSteamGameInfo(APIReturn: String){
-        val objectJSON = JSONObject(APIReturn)
+    private suspend fun parseSteamGameInfo(apiReturn: String): Game? {
+        val objectJSON = JSONObject(apiReturn)
             .getJSONObject("response").getJSONArray("apps").getJSONObject(0)
         val title = objectJSON.getString("name")
-        val icon = ""
+        var icon = ""
         if(objectJSON.has("icon")) {
-            val icon = objectJSON.getString("icon")
+            icon = objectJSON.getString("icon")
         }
         if(!checkGame(title)) {
-            insert(Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0))
+            return Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0F)
         }
+        return null
     }
 
     suspend fun scrapeGameInfo(title:String) = withContext(Dispatchers.IO){
@@ -142,35 +150,24 @@ class GameRepository(private val gameDao: GameDao) {
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun update(game: Game) {
         gameDao.update(game)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteAll() {
         gameDao.deleteAll()
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteGame(game: Game) {
         gameDao.deleteGame(game.id)
     }
 
-    @Suppress
     @WorkerThread
     suspend fun checkGame(title: String): Boolean {
-        return gameDao.getIfGameExists(title) != null
-    }
-}
-
-class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
-    override fun doInBackground(vararg params: Void?): Void? {
-        handler()
-        return null
+        return gameDao.getIfGameExists(title)
     }
 }
 

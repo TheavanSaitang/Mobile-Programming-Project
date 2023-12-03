@@ -44,7 +44,7 @@ abstract class GameRoomDatabase : RoomDatabase() {
                         1191974400,
                         "my first FPS - just use 'sv_cheats 1' and 'impulse 101'",
                         "",
-                        5)
+                        5f)
                     gameDao.insert(game)
 
                     game = Game(
@@ -59,7 +59,7 @@ abstract class GameRoomDatabase : RoomDatabase() {
                         1311636424,
                         "this is the title with the longest English name registered in the world. At least, it has a Guinness World Record..",
                         "",
-                        4)
+                        4f)
                     gameDao.insert(game)
                 }
             }
