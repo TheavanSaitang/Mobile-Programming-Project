@@ -44,6 +44,10 @@ class GameActivity : AppCompatActivity() {
         GameViewModelFactory((application as GamesApplication).repository,-1)
     }
 
+    fun scrapeGame(title: String){
+            gameViewModel.scrapeGameInfo(title)
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
@@ -96,6 +100,11 @@ class GameActivity : AppCompatActivity() {
                     }
 
                 }
+            }
+
+            val scrapeButton = findViewById<Button>(R.id.scrapeButton)
+            scrapeButton.setOnClickListener{
+                gameViewModel.scrapeGameInfo(etTitle.text.toString())
             }
 
             val saveButton = findViewById<Button>(R.id.buttonSave)

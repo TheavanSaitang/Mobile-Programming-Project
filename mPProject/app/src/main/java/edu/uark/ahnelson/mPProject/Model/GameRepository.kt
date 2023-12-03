@@ -11,8 +11,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Request.Builder
+import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 import org.json.JSONArray
 import org.json.JSONObject
@@ -38,15 +41,21 @@ class GameRepository(private val gameDao: GameDao) {
         return gameDao.getGameNotLive(id)
     }
     private val client = OkHttpClient()
-    private val APIKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
+    private val steamAPIKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
+    private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
+    private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
+    // Access token will expire in 54 days from writing of code. To get a new one manually:
+    // POST https://id.twitch.tv/oauth2/token?client_id=ea004to7ydnqixv12xvi2cq88nvkbo&client_secret=8tewxx9su460oqwdf9pu9kwvpy1lut&grant_type=client_credentials
+    private val twitchAccessToken = "whb5q3uuaze7p4cwk8xf0rpkllbxy6"
+
 
     //connects to Steam API, gets all app id's from a user with a specified userId, then calls a function
     //to parse them
     suspend fun getSteamGames(userId: String) = withContext(Dispatchers.IO) {
 
-        val request = Request.Builder()
+        val request = Builder()
             //https://api.steampowered.com/ISteamApps/GetAppList/v2
-            .url("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$APIKey&steamid=$userId&format=json")
+            .url("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$steamAPIKey&steamid=$userId&format=json")
             .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
@@ -73,7 +82,7 @@ class GameRepository(private val gameDao: GameDao) {
     }
     //gets appId and then calls steamAPI for more info, calls parseSteamGameInfo to parse it
     private suspend fun getSteamGameInfo(appId:String) {
-        val request = Request.Builder()
+        val request = Builder()
             .url("https://api.steampowered.com/ICommunityService/GetApps/v1/?key=FCBCDE0D333F3FA53CE2A1AB19FCCE52&appids%5B0%5D=$appId")
             .build()
         client.newCall(request).execute().use {response ->
@@ -97,6 +106,29 @@ class GameRepository(private val gameDao: GameDao) {
             insert(Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0))
         }
     }
+
+    suspend fun scrapeGameInfo(title:String) = withContext(Dispatchers.IO){
+        val client = OkHttpClient()
+        val mediaType = "text/plain".toMediaType()
+        val body = "fields id,name;\nwhere name ~ \"portal\"*;\nsort rating desc; \nlimit 100;".toRequestBody(mediaType)
+        val request = Request.Builder()
+            .url("https://api.igdb.com/v4/games")
+            .post(body)
+            .addHeader("Client-ID", "ea004to7ydnqixv12xvi2cq88nvkbo")
+            .addHeader("Content-Type", "text/plain")
+            .addHeader("Authorization", "Bearer whb5q3uuaze7p4cwk8xf0rpkllbxy6")
+            .addHeader("Cookie", "__cf_bm=11JPVcAkQbuVtB3MwyD8bijhEOj42rJxwQ1lQ.gdiqM-1701567544-0-AZvS+lxQziqaYbv5zAWhxhH+YjWDGL69COVFcv9NUv1f+ZhVwrz5BfueKGuC5AGA5OCxhiBjR2BrSz30H3yYrCI=")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            Log.d("GameRepository","Request successful!")
+            for((name, value) in response.headers) {
+                println("$name: $value")
+            }
+            Log.d("GameRepository",(response.body!!.string()))
+        }
+    }
+
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.

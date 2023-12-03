@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import edu.uark.ahnelson.mPProject.Model.Game
 import edu.uark.ahnelson.mPProject.Model.GameRepository
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class GameViewModel(private val repository: GameRepository, private val id:Int) : ViewModel() {
 
@@ -31,6 +33,12 @@ class GameViewModel(private val repository: GameRepository, private val id:Int) 
     suspend fun update(game: Game) {
         coroutineScope {
             repository.update(game)
+        }
+    }
+
+    fun scrapeGameInfo(title: String) {
+        viewModelScope.launch {
+            repository.scrapeGameInfo(title)
         }
     }
 
