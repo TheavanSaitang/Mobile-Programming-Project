@@ -23,13 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
-<<<<<<< HEAD
-=======
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
-import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
-
->>>>>>> e97d59c (SteamAPI Loading Fragment)
 // import edu.uark.ahnelson.mPProject.NewEditGameActivity.NewEditGameActivity.Companion.EXTRA_ID
 
 
@@ -44,16 +38,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-<<<<<<< HEAD
         val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
         addGameButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
-=======
-
-
->>>>>>> e97d59c (SteamAPI Loading Fragment)
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
