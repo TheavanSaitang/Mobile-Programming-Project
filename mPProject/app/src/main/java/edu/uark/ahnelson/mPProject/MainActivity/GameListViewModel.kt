@@ -1,6 +1,7 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -18,7 +19,7 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
     val allGames: LiveData<List<Game>> = repository.allGames.asLiveData()
     val completedGames: LiveData<List<Game>> = repository.completedGames.asLiveData()
     val incompleteGames: LiveData<List<Game>> = repository.incompleteGames.asLiveData()
-
+    val updating: MutableLiveData<Int> = repository.updating
     fun update(game: Game) {
         viewModelScope.launch {
             repository.update(game)
@@ -29,6 +30,7 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
             repository.getSteamGames(userId)
         }
     }
+
 }
 
 class GameListViewModelFactory(private val repository: GameRepository) : ViewModelProvider.Factory {

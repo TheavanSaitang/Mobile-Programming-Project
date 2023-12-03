@@ -1,8 +1,12 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.SyncStateContract
 import android.util.Log
 import android.widget.Button
 import android.widget.PopupMenu
@@ -10,6 +14,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.fragment.app.add
@@ -17,6 +23,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
+<<<<<<< HEAD
+=======
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
+import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
+
+>>>>>>> e97d59c (SteamAPI Loading Fragment)
 // import edu.uark.ahnelson.mPProject.NewEditGameActivity.NewEditGameActivity.Companion.EXTRA_ID
 
 
@@ -32,10 +45,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+<<<<<<< HEAD
         val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
         addGameButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
+=======
+
+
+>>>>>>> e97d59c (SteamAPI Loading Fragment)
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -63,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
                     //TODO ADD VERY VERY BASIC SETTINGS FRAGMENT
                     R.id.settings -> {
-                        val settingsFragment = SettingsFragment()
+                        val settingsFragment = LoadingFragment()
                         supportFragmentManager.commit {
                             setCustomAnimations(
                                 R.anim.fade_in,
@@ -139,11 +157,31 @@ class MainActivity : AppCompatActivity() {
                 words.let {
                     adapter.submitList(it)
                 }
-            }        }
+            }
+        }
+        gameListViewModel.updating.observe(this) { it ->
+            if(it == 1)
+            {
+                val loadingFragment = LoadingFragment()
+                supportFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                    )
+                    replace(R.id.fragment_container_view, loadingFragment, "loadingFragment")
+                    addToBackStack("loadingFragment")
+                }
+            }
+            else
+            {
+                supportFragmentManager.popBackStack("steamFragment", POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
+            }
+        }
     }
     //called by SteamFragment, initiates any steam stuff
     fun getSteamInfo(userId: String){
-        gameListViewModel.getSteamGames("76561198301339924")
+        gameListViewModel.getSteamGames("76561198044143028")
     }
     private fun gameItemClicked(id: Int){
         // todo: set up NewEditGameActivity intent when clicking a game tile ( view/edit game )
@@ -164,5 +202,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
 
