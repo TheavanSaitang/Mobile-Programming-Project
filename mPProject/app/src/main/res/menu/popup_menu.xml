@@ -2,13 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/addGame"
-        android:title="Add Game Manually" />
+        android:title="@string/menu_add_game" />
 
     <item
         android:id="@+id/importLibrary"
-        android:title="Import Steam Library" />
+        android:title="@string/menu_import_steam" />
 
     <item
         android:id="@+id/settings"
-        android:title="Settings" />
+        android:title="@string/settings" />
+    <item
+        android:id="@+id/clearDatabase"
+        android:title="Clear All" />
 </menu>
