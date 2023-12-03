@@ -1,17 +1,16 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 
-import android.icu.text.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.uark.ahnelson.mPProject.Model.Game
 import edu.uark.ahnelson.mPProject.R
-import java.util.Calendar
 
 class GameListAdapter(val itemClicked: (id: Int) -> Unit)
     : ListAdapter<Game, GameListAdapter.GameViewHolder>(GameComparator()) {
@@ -25,7 +24,7 @@ class GameListAdapter(val itemClicked: (id: Int) -> Unit)
 
         // Bind info to the MainActivity recyclerView and set up onClickListener
         current.id?.let {
-            holder.bind(it,current.title,current.system)
+            holder.bind(it,current.title,current.system,current.rating)
         }
         holder.itemView.tag = current.id
         holder.itemView.setOnClickListener {
@@ -38,11 +37,16 @@ class GameListAdapter(val itemClicked: (id: Int) -> Unit)
     class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val gameTitleView: TextView = itemView.findViewById(R.id.tvTitle)
         private val gameSystemView:TextView = itemView.findViewById(R.id.tvSystem)
+        private val ratingBar: RatingBar = itemView.findViewById(R.id.ratingBarShow)
 
         //
-        fun bind(id:Int, title: String?, system: String?) {
+        fun bind(id:Int, title: String?, system: String?, score: Float?) {
             gameTitleView.text = title
             gameSystemView.text = system
+            if (score != null) {
+                ratingBar.rating = score
+                }
+            ratingBar.setIsIndicator(true)
             }
         companion object {
             fun create(parent: ViewGroup): GameViewHolder {

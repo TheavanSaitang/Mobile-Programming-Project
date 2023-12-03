@@ -94,7 +94,7 @@ class GameRepository(private val gameDao: GameDao) {
             val icon = objectJSON.getString("icon")
         }
         if(!checkGame(title)) {
-            insert(Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0))
+            insert(Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0f))
         }
     }
     // By default Room runs suspend queries off the main thread, therefore, we don't need to

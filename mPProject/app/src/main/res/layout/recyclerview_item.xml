@@ -16,6 +16,7 @@
         android:layout_marginStart="@dimen/medium_padding"
         android:layout_marginTop="@dimen/medium_padding"
         android:layout_marginBottom="@dimen/medium_padding"
+        android:fontFamily="monospace"
         android:gravity="fill_vertical"
         android:scrollIndicators="none"
         android:text="Game Title"
@@ -24,7 +25,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ratingBar"/>
+        app:layout_constraintEnd_toStartOf="@+id/ratingBarShow"/>
 
     <TextView
         android:id="@+id/tvSystem"
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium_padding"
         android:paddingHorizontal="8dp"
+        android:fontFamily="monospace"
         android:text="System"
         android:textAlignment="textStart"
         android:textAllCaps="false"
@@ -45,7 +47,7 @@
 
 
     <me.zhanghai.android.materialratingbar.MaterialRatingBar
-        android:id="@+id/ratingBar"
+        android:id="@+id/ratingBarShow"
         style="@style/Widget.MaterialRatingBar.RatingBar"
         app:mrb_progressBackgroundTint="@color/colorAccent"
         android:layout_width="wrap_content"
