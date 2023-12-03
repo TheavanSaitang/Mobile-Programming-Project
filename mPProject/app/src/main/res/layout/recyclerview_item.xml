@@ -2,7 +2,6 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/big_padding"
@@ -18,7 +17,7 @@
         android:layout_marginBottom="@dimen/medium_padding"
         android:gravity="fill_vertical"
         android:scrollIndicators="none"
-        android:text="Game Title"
+        android:text="@string/game_title"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintHorizontal_bias="0.0"
@@ -33,7 +32,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium_padding"
         android:paddingHorizontal="8dp"
+<<<<<<< Updated upstream
         android:text="System"
+=======
+        android:fontFamily="monospace"
+        android:text="@string/system"
+>>>>>>> Stashed changes
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textSize="14sp"

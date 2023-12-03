@@ -1,9 +1,6 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 
-import android.animation.Animator
 import android.os.Bundle
-import android.os.Handler
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,17 +9,12 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import edu.uark.ahnelson.mPProject.R
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
-import androidx.fragment.app.commit
-
 
 class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_settings, container, false)
-
+        val parentActivity = activity as MainActivity
         //defines exit animation
         val exitAnimation = AnimationUtils.loadAnimation(activity, R.anim.fade_out)
         //exitAnimation behavior
@@ -32,7 +24,7 @@ class SettingsFragment : Fragment() {
             }
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
-                activity?.supportFragmentManager?.popBackStack("settingsFragment", POP_BACK_STACK_INCLUSIVE)
+                parentActivity.supportFragmentManager.popBackStack("settingsFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
             override fun onAnimationStart(animation: Animation?) {
@@ -44,7 +36,7 @@ class SettingsFragment : Fragment() {
             //runs exitAnimation, once animation ends the fragment is removed from the backstack
             root.startAnimation(exitAnimation)
         }
-        //TODO MAKE SUBMIT ACTUALLY SUBMIT TO SOMEWHERE
+        //submits settings (none implemented)
         val buttonSubmit = root.findViewById<Button>(R.id.btnSubmit)
         buttonSubmit.setOnClickListener {
             root.startAnimation(exitAnimation)

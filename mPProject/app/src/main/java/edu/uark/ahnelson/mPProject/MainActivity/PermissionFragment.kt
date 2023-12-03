@@ -6,15 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 
-
-class LoadingFragment : Fragment() {
+class PermissionFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_loading, container, false)
-
+        val root = inflater.inflate(R.layout.fragment_clear_permission, container, false)
+        val parentActivity = activity as MainActivity
         //defines exit animation
         val exitAnimation = AnimationUtils.loadAnimation(activity, R.anim.fade_out)
         //exitAnimation behavior
@@ -24,13 +24,23 @@ class LoadingFragment : Fragment() {
             }
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
-                activity?.supportFragmentManager?.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
+                parentActivity.supportFragmentManager.popBackStack("permissionFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
             override fun onAnimationStart(animation: Animation?) {
                 //no need to implement
             }
         })
+        val buttonNo = root.findViewById<Button>(R.id.btnCancel)
+        buttonNo.setOnClickListener{
+            //runs exitAnimation, once animation ends the fragment is removed from the backstack
+            root.startAnimation(exitAnimation)
+        }
+        val buttonYes = root.findViewById<Button>(R.id.btnSubmit)
+        buttonYes.setOnClickListener {
+            parentActivity.deleteAll()
+            root.startAnimation(exitAnimation)
+        }
         return root
     }
 }

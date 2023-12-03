@@ -19,28 +19,17 @@
 
         <TextView
             android:id="@+id/titleLogin"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/steam_login"
+            android:text="Are you sure?"
             android:textAlignment="center"
             android:textColor="@color/colorLightText"
             android:textSize="26sp"
             android:typeface="monospace"
             android:padding="@dimen/small_padding"
-            android:background="@drawable/rounded_bg_color_primary"/>
+            android:background="@drawable/rounded_bg_color_primary"
+            android:layout_marginBottom="@dimen/big_padding"/>
 
-        <EditText
-            android:id="@+id/inputUsername"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_margin="@dimen/big_padding"
-            android:background="@drawable/rounded_bg_color_accent_border"
-            android:hint="@string/steam_id"
-            android:textAlignment="viewStart"
-            android:textColor="@color/colorDarkText"
-            android:textSize="26sp"
-            android:typeface="monospace"
-            android:padding="@dimen/small_padding"/>
         <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -55,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_bg_color_accent_border"
                 android:padding="@dimen/medium_padding"
-                android:text="@string/cancel"
+                android:text="No"
                 android:textColor="@color/colorDarkText" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -65,32 +54,10 @@
                 android:layout_marginStart="20sp"
                 android:background="@drawable/rounded_bg_color_accent_border"
                 android:padding="@dimen/medium_padding"
-                android:text="@string/submit"
+                android:text="Yes"
                 android:textColor="@color/colorDarkText" />
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/disclaimer"
-            android:textSize = "12sp"
-            android:background = "@color/colorPrimary"
-            android:typeface = "monospace"
-            android:layout_marginTop = "@dimen/big_padding"
-            android:gravity = "center"/>
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="46sp"
-            android:layout_marginBottom="@dimen/big_padding"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:text="@string/steamFragmentDisclaimer"
-            android:textSize="12sp"
-            android:typeface="monospace" />
 
 
     </LinearLayout>

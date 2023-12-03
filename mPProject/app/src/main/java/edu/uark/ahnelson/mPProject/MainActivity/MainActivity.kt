@@ -1,24 +1,17 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract
 import android.util.Log
 import android.widget.Button
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.fragment.app.add
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.R
@@ -38,10 +31,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+<<<<<<< Updated upstream
         val addGameButton = findViewById<FloatingActionButton>(R.id.fab)
         addGameButton.setOnClickListener{
             Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
         }
+=======
+
+
+>>>>>>> Stashed changes
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -67,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                             }
                     }
 
-                    //TODO ADD VERY VERY BASIC SETTINGS FRAGMENT
+                    //very basic settings fragment
                     R.id.settings -> {
                         val settingsFragment = LoadingFragment()
                         supportFragmentManager.commit {
@@ -79,6 +77,20 @@ class MainActivity : AppCompatActivity() {
                             )
                             replace(R.id.fragment_container_view, settingsFragment, "settingsFragment")
                             addToBackStack("settingsFragment")
+                        }
+                    }
+
+                    R.id.clearDatabase -> {
+                        val permissionFragment = PermissionFragment()
+                        supportFragmentManager.commit {
+                            setCustomAnimations(
+                                R.anim.fade_in,
+                                R.anim.fade_out,
+                                R.anim.fade_in,
+                                R.anim.fade_out
+                            )
+                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment]")
+                            addToBackStack("permissionFragment")
                         }
                     }
                     else -> {
@@ -147,8 +159,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        gameListViewModel.updating.observe(this) { it ->
-            if(it == 1)
+        //if "loading" is true, use loadingFragment
+        //else, close steamFragment & loadingFragment
+        gameListViewModel.loading.observe(this) { loading ->
+            if(loading)
             {
                 val loadingFragment = LoadingFragment()
                 supportFragmentManager.commit {
@@ -171,6 +185,9 @@ class MainActivity : AppCompatActivity() {
     fun getSteamInfo(userId: String){
         gameListViewModel.getSteamGames("76561198044143028")
     }
+    fun deleteAll(){
+        gameListViewModel.deleteAll()
+    }
     private fun gameItemClicked(id: Int){
         // todo: set up NewEditGameActivity intent when clicking a game tile ( view/edit game )
         Toast.makeText(this, "Functionality not implemented", Toast.LENGTH_SHORT).show()
@@ -181,7 +198,11 @@ class MainActivity : AppCompatActivity() {
 
     // This is our ActivityResultContracts value that defines the behavior of our application when the MainActivity has finished.
     // Should be called above in gameItemClicked.
+<<<<<<< Updated upstream
     val startNewGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+=======
+    private val startGameActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+>>>>>>> Stashed changes
             result: ActivityResult ->
         if(result.resultCode== Activity.RESULT_OK){
             //Note that all we are doing is logging that we completed

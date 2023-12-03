@@ -19,10 +19,15 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
     val allGames: LiveData<List<Game>> = repository.allGames.asLiveData()
     val completedGames: LiveData<List<Game>> = repository.completedGames.asLiveData()
     val incompleteGames: LiveData<List<Game>> = repository.incompleteGames.asLiveData()
-    val updating: MutableLiveData<Int> = repository.updating
+    val loading: MutableLiveData<Boolean> = repository.loading
     fun update(game: Game) {
         viewModelScope.launch {
             repository.update(game)
+        }
+    }
+    fun deleteAll() {
+        viewModelScope.launch {
+            repository.deleteAll()
         }
     }
     fun getSteamGames(userId: String) {

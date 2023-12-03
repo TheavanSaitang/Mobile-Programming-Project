@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">MP Project</string>
+<<<<<<< Updated upstream
+=======
+    <string name="save">SAVE</string>
+    <string name="loading">Loading</string>
+    <string name="settings">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="steam_login">Steam Login</string>
+    <string name="steam_id">Steam ID</string>
+    <string name="disclaimer">DISCLAIMER</string>
+    <string name="steamFragmentDisclaimer">Profile must be made public in order to see complete functionality</string>
+    <string name="game_title">Game Title</string>
+    <string name="system">System</string>
+    <string name="menu_add_game">Add Game Manually</string>
+    <string name="menu_import_steam">Import Steam Library</string>
+>>>>>>> Stashed changes
 </resources>
