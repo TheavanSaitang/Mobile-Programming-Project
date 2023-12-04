@@ -17,11 +17,24 @@ class GameRepository(private val gameDao: GameDao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    val allGames: Flow<List<Game>> = gameDao.getAlphabetizedGames()
-    val completedGames: Flow<List<Game>> = gameDao.getCompletedGames(true)
-    val incompleteGames: Flow<List<Game>> = gameDao.getCompletedGames(false)
+    val allGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedGames()
+    val allGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedGames()
+    val allGamesByRating: Flow<List<Game>> = gameDao.getGamesByRating()
+    val allGamesByReverseRating: Flow<List<Game>> = gameDao.getGamesByReverseRating()
+    val completedGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedCompletedGames(true)
+    val completedGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedCompletedGames(true)
+    val completedGamesByRating: Flow<List<Game>> = gameDao.getCompletedGamesByRating(true)
+    val completedGamesByReverseRating: Flow<List<Game>> = gameDao.getCompleteGamesByReverseRating(true)
+    val incompleteGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedCompletedGames(false)
+    val incompleteGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedCompletedGames(false)
+    val incompleteGamesByRating: Flow<List<Game>> = gameDao.getCompletedGamesByRating(false)
+    val incompleteGamesByReverseRating: Flow<List<Game>> = gameDao.getCompleteGamesByReverseRating(false)
     var loading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
+
+    fun setAllGames(mode:Int){
+
+    }
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     fun getGame(id:Int):Flow<Game>{

@@ -66,7 +66,7 @@ class GameActivity : AppCompatActivity() {
         gameViewModel.curGame.observe(this) { game ->
             game?.let {
                 if(game.art != "") {
-                    imGame.setImageBitmap(game.art?.let { it1 -> getPic(it1, imGame.width, imGame.height) })
+                    //imGame.setImageBitmap(game.art?.let { it1 -> getPic(it1, imGame.width, imGame.height) })
                     initialArt = game.art!!
                 }
                 etTitle.setText(game.title)
@@ -91,7 +91,7 @@ class GameActivity : AppCompatActivity() {
                     ratingBar.rating = game.rating!!
                     etNotes.setText(game.notes)
                     if(game.photos != "") {
-                        imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
+                        //imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
                         initialPhotos = game.photos!!
                     }
 
@@ -165,7 +165,7 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPic(photoPath: String, w: Int, h: Int): Bitmap {
+    /*private fun getPic(photoPath: String, w: Int, h: Int): Bitmap {
         val targetW: Int = w
 
         // Get the dimensions of the bitmap
@@ -183,5 +183,5 @@ class GameActivity : AppCompatActivity() {
         bmOptions.inSampleSize = scaleFactor
         val bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
         return bitmap
-    }
+    }*/
 }

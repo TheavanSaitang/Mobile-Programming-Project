@@ -18,13 +18,15 @@ import edu.uark.ahnelson.mPProject.R
 import androidx.fragment.app.commit
 import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
 import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
-class MainActivity : AppCompatActivity() {
+import edu.uark.ahnelson.mPProject.Model.Game
+
+class MainActivity : AppCompatActivity(){
 
     //This instantiates the viewModel instance
     private val gameListViewModel: GameListViewModel by viewModels {
         GameListViewModelFactory((application as GamesApplication).repository)
     }
-
+    private var filterMode: Int = 0
     //onCreate override class
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        var sortMode = 0
         navButton.setOnClickListener{
             val popupMenu = PopupMenu(this@MainActivity, navButton)
 
@@ -59,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
                     //very basic settings fragment
                     R.id.settings -> {
-                        val settingsFragment = LoadingFragment()
+                        val settingsFragment = SettingsFragment()
                         supportFragmentManager.commit {
                             setCustomAnimations(
                                 R.anim.fade_in,
@@ -97,13 +101,6 @@ class MainActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        //TODO make fab sort
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, GameActivity::class.java)
-            startGameActivity.launch(intent)
-        }
-
         // Set up RecyclerView for games list
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val adapter = GameListAdapter(this::gameItemClicked)
@@ -111,44 +108,179 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
 
-        // Add an observer on the LiveData returned by getAlphabetizedWords.
-        // The onChanged() method fires when the observed data changes and the activity is
-        // in the foreground.
-        gameListViewModel.allGames.observe( this) { words ->
-            // Update the cached copy of the words in the adapter.
-            words.let {
-                adapter.submitList(it)
+        //MASSIVE observer function, used all over the MainActivity, unfortunately it has to be defined
+        //up here as to make everything else work
+
+        fun observe(){
+            when(filterMode){
+                //all games filter
+                0->{
+                    when(sortMode){
+                        //alphabetical descending sort
+                        0->{
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_descending)
+                            gameListViewModel.allGamesAlphabetized.observe( this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //alphabetical ascending sort
+                        1->{
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_ascending)
+                            gameListViewModel.allGamesReverseAlphabetized.observe( this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating descending sort
+                        2->{
+                            fab.setImageResource(R.drawable.ic_sort_rating_ascending)
+                            gameListViewModel.allGamesByRating.observe( this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating ascending sort
+                        3->{
+                            fab.setImageResource(R.drawable.ic_sort_rating_descending)
+                            gameListViewModel.allGamesByReverseRating.observe( this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //completed games filter
+                1-> {
+                    when (sortMode) {
+                        //alphabetical descending sort
+                        0 -> {
+                            Log.d("Debug", "Made it")
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_descending)
+                            gameListViewModel.completedGamesAlphabetized.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //alphabetical ascending sort
+                        1 -> {
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_ascending)
+                            gameListViewModel.completedGamesReverseAlphabetized.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating descending sort
+                        2 -> {
+                            fab.setImageResource(R.drawable.ic_sort_rating_ascending)
+                            gameListViewModel.completedGamesByRating.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating ascending sort
+                        3 -> {
+                            fab.setImageResource(R.drawable.ic_sort_rating_descending)
+                            gameListViewModel.completedGamesByReverseRating.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //incomplete games filter
+                2-> {
+                    when (sortMode) {
+                        //alphabetical descending sort
+                        0 -> {
+                            Log.d("Debug", "Made it")
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_descending)
+                            gameListViewModel.incompleteGamesAlphabetized.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //alphabetical ascending sort
+                        1 -> {
+                            fab.setImageResource(R.drawable.ic_sort_alphabetical_ascending)
+                            gameListViewModel.incompleteGamesReverseAlphabetized.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating descending sort
+                        2 -> {
+                            fab.setImageResource(R.drawable.ic_sort_rating_ascending)
+                            gameListViewModel.incompleteGamesByRating.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                        //rating ascending sort
+                        3 -> {
+                            fab.setImageResource(R.drawable.ic_sort_rating_descending)
+                            gameListViewModel.incompleteGamesByReverseRating.observe(this) { words ->
+                                // Update the cached copy of the words in the adapter.
+                                words.let {
+                                    adapter.submitList(it)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+        observe()
+        //fab button cycles through sorting modes
 
-        //Phillip - Temporary action definitions for buttons, this will work until we get the game
+
+        fab.setOnClickListener {
+            sortMode++
+            sortMode %= 4
+            Log.d("Sort", sortMode.toString())
+            observe()
+        }
+
+        //filter buttons
         //data displayed
         val gamesButton = findViewById<Button>(R.id.btnGames)
         gamesButton.setOnClickListener{
-            gameListViewModel.allGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+            filterMode = 0
+            observe()
         }
-        val favoritesButton = findViewById<Button>(R.id.btnFavorites)
-        favoritesButton.setOnClickListener{
-            gameListViewModel.completedGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+        val completeButton = findViewById<Button>(R.id.btnCompleted)
+        completeButton.setOnClickListener{
+            filterMode = 1
+            observe()
         }
-        val wantToPlayButton = findViewById<Button>(R.id.btnWantToPlay)
-        wantToPlayButton.setOnClickListener{
-            gameListViewModel.incompleteGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+        val incompleteButton = findViewById<Button>(R.id.btnIncomplete)
+        incompleteButton.setOnClickListener{
+            filterMode = 2
+            observe()
         }
         //if "loading" is true, use loadingFragment
         //else, close steamFragment & loadingFragment
@@ -195,5 +327,14 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity","Completed")
         }
     }
-}
 
+    fun compare(p0: Game, p1: Game): Int {
+        val result = p0.title.compareTo(p1.title)
+        return if(result > 0)
+            1;
+        else if(result == 0)
+            0;
+        else
+            -1
+    }
+}

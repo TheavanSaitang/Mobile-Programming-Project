@@ -35,8 +35,6 @@
         android:paddingHorizontal="8dp"
         android:fontFamily="monospace"
         android:text="System"
-        android:fontFamily="monospace"
-        android:text="@string/system"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textSize="14sp"

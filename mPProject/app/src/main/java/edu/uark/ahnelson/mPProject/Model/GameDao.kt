@@ -1,5 +1,6 @@
 package edu.uark.ahnelson.mPProject.Model
 
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -12,9 +13,20 @@ interface GameDao {
     //Get all games alphabetized
     @Query("SELECT * FROM game_table ORDER BY title ASC")
     fun getAlphabetizedGames(): Flow<List<Game>>
-
+    @Query("SELECT * FROM game_table ORDER BY title DESC")
+    fun getReverseAlphabetizedGames(): Flow<List<Game>>
+    @Query("SELECT * FROM game_table ORDER BY rating DESC")
+    fun getGamesByRating(): Flow<List<Game>>
+    @Query("SELECT * FROM game_table ORDER BY rating ASC")
+    fun getGamesByReverseRating(): Flow<List<Game>>
     @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY title ASC")
-    fun getCompletedGames(isCompleted:Boolean): Flow<List<Game>>
+    fun getAlphabetizedCompletedGames(isCompleted:Boolean): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY title DESC")
+    fun getReverseAlphabetizedCompletedGames(isCompleted:Boolean): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY rating DESC")
+    fun getCompletedGamesByRating(isCompleted:Boolean): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY rating ASC")
+    fun getCompleteGamesByReverseRating(isCompleted:Boolean): Flow<List<Game>>
 
     //Get a single game with a given id
     @Query("SELECT * FROM game_table WHERE id=:id")
