@@ -54,7 +54,11 @@ class GameRepository(private val gameDao: GameDao) {
     }
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
-    suspend fun getSteamUser(userId:String): String = withContext(Dispatchers.IO){
+    //this function is kinda stupid
+    //tries to get steamUser from userId parameter
+    //if steamUser is gotten, it sets playerTitle, playerIcon, and playerId to referencable values
+    //if no steamUser is gotten, it sets those variables to null
+    suspend fun getSteamUser(userId:String) = withContext(Dispatchers.IO){
         transactionComplete.postValue(false)
         val request = Request.Builder()
             .url("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=$apiKey&steamids=$userId")
@@ -85,7 +89,6 @@ class GameRepository(private val gameDao: GameDao) {
                 playerId.postValue("")
             }
             transactionComplete.postValue(true)}
-        return@withContext ""
     }
     //connects to Steam API, gets all app id's from a user with a specified userId, then calls a function
     //to parse them
