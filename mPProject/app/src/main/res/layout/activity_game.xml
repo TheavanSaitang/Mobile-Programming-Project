@@ -50,7 +50,6 @@
                     android:fontFamily="monospace"
                     android:gravity="start|top"
                     android:background="#00000000"
-                    android:gravity="bottom|start"
                     android:hint="Enter game title"
                     android:inputType="textMultiLine"
                     android:text=""
