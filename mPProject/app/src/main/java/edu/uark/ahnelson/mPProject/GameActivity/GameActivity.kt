@@ -100,27 +100,9 @@ class GameActivity : AppCompatActivity() {
         }
         gameViewModel.curGame.observe(this) { game ->
             game?.let {
-                photoPathArt = game.art.toString()
-                if(game.art.toString() != "" && game.art.toString().substring(0, 1) == "h") {
-                    myExecutor.execute {
-                        var image: Bitmap? = fetchIcon(game.art.toString())
-                        myHandler.post {
-                            if (image != null) {
-                                saveImage(image)
-                            }
-                        }
-                    }
-                }
-                if(photoPathArt != ""){
-                    lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            Thread.sleep(200)
-                            withContext(Dispatchers.Main){
-                                setPic()
-                                Log.d("Hey", photoPathArt)
-                            }
-                        }
-                    }
+                if(game.art != "") {
+                    //imGame.setImageBitmap(game.art?.let { it1 -> getPic(it1, imGame.width, imGame.height) })
+                    initialArt = game.art!!
                 }
                 etTitle.setText(game.title)
                 etSystem.setText(game.system)
@@ -143,6 +125,10 @@ class GameActivity : AppCompatActivity() {
                     cbComplete.setChecked(game.completed)
                     ratingBar.rating = game.rating!!
                     etNotes.setText(game.notes)
+                    if(game.photos != "") {
+                        //imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
+                        initialPhotos = game.photos!!
+                    }
 
                     }
                 photoPathPics = game.photos.toString()
@@ -239,65 +225,8 @@ class GameActivity : AppCompatActivity() {
         super.onResume()
     }
 
-    val takePictureResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            result: ActivityResult ->
-        if(result.resultCode == Activity.RESULT_CANCELED){
-            Log.d("MainActivity","Take Picture Activity Cancelled")
-        }else{
-            Log.d("MainActivity", "Picture Taken")
-            setPic()
-        }
-    }
-
-    val takePictureResultLauncherPics = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            result: ActivityResult ->
-        if(result.resultCode == Activity.RESULT_CANCELED){
-            Log.d("MainActivity","Take Picture Activity Cancelled")
-        }else{
-            Log.d("MainActivity", "Picture Taken")
-            setPicPhotos()
-        }
-    }
-
-    private fun takeAPicture() {
-        val picIntent: Intent =  Intent().setAction(MediaStore.ACTION_IMAGE_CAPTURE)
-        if(picIntent.resolveActivity(packageManager) != null){
-            val filepath: String = createFilePath()
-            val myFile: File = File(filepath)
-            photoPathArt = filepath
-            val photoUri = FileProvider.getUriForFile(this,"edu.uark.ahnelson.mPProject.fileprovider",myFile)
-            picIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
-            takePictureResultLauncher.launch(picIntent)
-        }
-    }
-
-    private fun takeAPicturePhotos() {
-        val picIntent: Intent =  Intent().setAction(MediaStore.ACTION_IMAGE_CAPTURE)
-        if(picIntent.resolveActivity(packageManager) != null){
-            val filepath: String = createFilePath()
-            val myFile: File = File(filepath)
-            photoPathPics = filepath
-            val photoUri = FileProvider.getUriForFile(this,"edu.uark.ahnelson.mPProject.fileprovider",myFile)
-            picIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
-            takePictureResultLauncherPics.launch(picIntent)
-        }
-    }
-
-    private fun createFilePath(): String {
-        // Create an image file name
-        val imageFileName = "JPEG_" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + "_"
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File.createTempFile(
-            imageFileName,  /* prefix */
-            ".jpg",  /* suffix */
-            storageDir /* directory */
-        )
-        // Save a file: path for use with ACTION_VIEW intent
-        return image.absolutePath
-    }
-
-    private fun setPic() {
-        val targetW: Int = imGame.getWidth()
+    /*private fun getPic(photoPath: String, w: Int, h: Int): Bitmap {
+        val targetW: Int = w
 
         // Get the dimensions of the bitmap
         val bmOptions = BitmapFactory.Options()
@@ -313,91 +242,9 @@ class GameActivity : AppCompatActivity() {
 
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
-        val bitmap = BitmapFactory.decodeFile(photoPathArt, bmOptions)
-        imGame.setImageBitmap(bitmap)
-    }
-
-    private fun setPicPhotos() {
-        val targetW: Int = imPictures.getWidth()
-
-        // Get the dimensions of the bitmap
-        val bmOptions = BitmapFactory.Options()
-        bmOptions.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(photoPathPics, bmOptions)
-        val photoW = bmOptions.outWidth
-        val photoH = bmOptions.outHeight
-        val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
-        val targetH: Int = imPictures.getHeight()
-
-
-        bmOptions.inJustDecodeBounds = false
-        val bitmap = BitmapFactory.decodeFile(photoPathPics, bmOptions)
-        imPictures.setImageBitmap(bitmap)
-    }
-
-    private fun fetchIcon(webPath: String): Bitmap? {
-        val url: URL = stringToURL(webPath)!!
-        val connection: HttpURLConnection?
-        try {
-            connection = url.openConnection() as HttpURLConnection
-            connection.connect()
-            val inputStream: InputStream = connection.inputStream
-            val bufferedInputStream = BufferedInputStream(inputStream)
-            return BitmapFactory.decodeStream(bufferedInputStream)
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-        }
-        return null
-    }
-
-    private fun stringToURL(string: String): URL? {
-        try {
-            return URL(string)
-        } catch (ex: MalformedURLException) {
-            ex.printStackTrace()
-        }
-        return null
-    }
-
-    private fun saveImage(bitmap: Bitmap?) {
-        val filename = "INTERNET" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + "_"
-        var fos: OutputStream? = null
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            this.contentResolver?.also { resolver ->
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-                }
-                val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                fos = imageUri?.let { resolver.openOutputStream(it) }
-                if (imageUri != null) {
-                    photoPathArt = getRealPathFromURI(imageUri).toString()
-                }
-            }
-        } else {
-            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val image = File(imagesDir, filename)
-            photoPathArt = image.absolutePath
-            fos = FileOutputStream(image)
-        }
-        fos?.use {
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-    }
-
-    private fun getRealPathFromURI(contentUri: Uri): String? {
-        val proj = arrayOf(MediaStore.Images.Media.DATA)
-        val loader = CursorLoader(this, contentUri, proj, null, null, null)
-        val cursor: Cursor? = loader.loadInBackground()
-        val columnIndex: Int = cursor
-            ?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            ?: return null
-        cursor.moveToFirst()
-        val result: String? = cursor.getString(columnIndex)
-        cursor.close()
-        return result
-    }
+        val bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
+        return bitmap
+    }*/
 }
 
 

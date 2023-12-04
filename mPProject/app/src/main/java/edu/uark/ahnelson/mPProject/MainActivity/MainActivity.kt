@@ -9,8 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
+import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.PopupMenu
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,18 +35,24 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import edu.uark.ahnelson.mPProject.Model.Game
+import java.security.Key
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
 
     //This instantiates the viewModel instance
-    private val gameListViewModel: GameListViewModel by viewModels {
+    val gameListViewModel: GameListViewModel by viewModels {
         GameListViewModelFactory((application as GamesApplication).repository)
     }
-
+    private var filterMode: Int = 0
+    val steamFragment = SteamFragment()
     //onCreate override class
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var sortMode = 0
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        val searchBar = findViewById<EditText>(R.id.searchBar)
         //creates a popupMenu on click of navButton
         //popupMenu has three options, "Add Game", "Import Steam Library", and "Settings"
         val navButton = findViewById<Button>(R.id.btnNav)
@@ -59,7 +70,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.importLibrary -> {
-                            val steamFragment = SteamFragment()
                             supportFragmentManager.commit {
                                 setCustomAnimations(
                                     R.anim.fade_in,
@@ -72,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
                     //very basic settings fragment
                     R.id.settings -> {
-                        val settingsFragment = LoadingFragment()
+                        val settingsFragment = SettingsFragment()
                         supportFragmentManager.commit {
                             setCustomAnimations(
                                 R.anim.fade_in,
@@ -94,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                                 R.anim.fade_in,
                                 R.anim.fade_out
                             )
-                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment]")
+                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment")
                             addToBackStack("permissionFragment")
                         }
                     }
@@ -110,59 +120,79 @@ class MainActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        //TODO make fab sort
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, GameActivity::class.java)
-            startGameActivity.launch(intent)
-        }
-
         // Set up RecyclerView for games list
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val adapter = GameListAdapter(this::gameItemClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        // Add an observer on the LiveData returned by getAlphabetizedWords.
-        // The onChanged() method fires when the observed data changes and the activity is
-        // in the foreground.
-        gameListViewModel.allGames.observe( this) { words ->
-            // Update the cached copy of the words in the adapter.
-            words.let {
-                adapter.submitList(it)
+        //observer function, switches the flow which the function is currently observing to that of
+        //another flow, defined by parameters passed in
+        //sort 0-3 are described in when(sortMode)
+        //filter 0 = allGames
+        //filter 1 = completedGames
+        //filter 2 = incompleteGames
+        fun observe(sort:Int, filter:Int, keyword:String){
+            when(sortMode){
+                0->fab.setImageResource(R.drawable.ic_sort_alphabetical_descending)
+                1->fab.setImageResource(R.drawable.ic_sort_alphabetical_ascending)
+                2->fab.setImageResource(R.drawable.ic_sort_rating_ascending)
+                3->fab.setImageResource(R.drawable.ic_sort_rating_descending)
+            }
+            gameListViewModel.getFlow(sort, filter, keyword).observe(this) { words ->
+                words.let{
+                    adapter.submitList(it)
+                }
             }
         }
+        observe(0, filterMode, searchBar.text.toString())
 
-        //Phillip - Temporary action definitions for buttons, this will work until we get the game
-        //data displayed
+        //fab button cycles through sorting modes
+        fab.setOnClickListener {
+            sortMode++
+            sortMode %= 4
+            Log.d("Sort", sortMode.toString())
+            //must re-observe in order to see changes
+            observe(sortMode, filterMode, searchBar.text.toString())
+        }
+
+        //re-observes the database every time searchbar text is changed
+        //allows user to dynamically see search query as it is typed
+        searchBar.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                return
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                return
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+                observe(sortMode, filterMode, searchBar.text.toString())
+                return
+            }
+
+        })
+        //filter buttons
         val gamesButton = findViewById<Button>(R.id.btnGames)
         gamesButton.setOnClickListener{
-            gameListViewModel.allGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+            filterMode = 0
+            //must re-observe in order to see changes
+            observe(sortMode, filterMode, searchBar.text.toString())
         }
-        val favoritesButton = findViewById<Button>(R.id.btnFavorites)
-        favoritesButton.setOnClickListener{
-            gameListViewModel.completedGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+        val completeButton = findViewById<Button>(R.id.btnCompleted)
+        completeButton.setOnClickListener{
+            filterMode = 1
+            //must re-observe in order to see changes
+            observe(sortMode, filterMode, searchBar.text.toString())
         }
-        val wantToPlayButton = findViewById<Button>(R.id.btnWantToPlay)
-        wantToPlayButton.setOnClickListener{
-            gameListViewModel.incompleteGames.observe( this) { words ->
-                // Update the cached copy of the words in the adapter.
-                words.let {
-                    adapter.submitList(it)
-                }
-            }
+        val incompleteButton = findViewById<Button>(R.id.btnIncomplete)
+        incompleteButton.setOnClickListener{
+            filterMode = 2
+            //must re-observe in order to see changes
+            observe(sortMode, filterMode, searchBar.text.toString())
         }
+
         //if "loading" is true, use loadingFragment
         //else, close steamFragment & loadingFragment
         gameListViewModel.loading.observe(this) { loading ->
@@ -184,10 +214,29 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
             }
         }
+        gameListViewModel.transactionComplete.observe(this){transactionComplete ->
+            if(transactionComplete){
+                val steamConfirmFragment: SteamConfirmFragment = SteamConfirmFragment()
+                supportFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                    )
+                    replace(R.id.fragment_container_view, steamConfirmFragment, "steamConfirmFragment")
+                    addToBackStack("steamConfirmFragment")
+                }
+            }
+        }
     }
     //called by SteamFragment, initiates any steam stuff
-    fun getSteamInfo(userId: String){
-        gameListViewModel.getSteamGames("76561198044143028")
+    fun getSteamUser(userId: String){
+        gameListViewModel.getSteamUser("76561198044143028")
+        //76561198044143028
+    }
+    fun getSteamGames(){
+        gameListViewModel.getSteamGames()
     }
     fun deleteAll(){
         gameListViewModel.deleteAll()
@@ -210,4 +259,3 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
-
