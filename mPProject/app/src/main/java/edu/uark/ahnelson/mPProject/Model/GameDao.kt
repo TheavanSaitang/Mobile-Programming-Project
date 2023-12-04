@@ -11,22 +11,22 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GameDao {
     //Get all games alphabetized
-    @Query("SELECT * FROM game_table ORDER BY title ASC")
-    fun getAlphabetizedGames(): Flow<List<Game>>
-    @Query("SELECT * FROM game_table ORDER BY title DESC")
-    fun getReverseAlphabetizedGames(): Flow<List<Game>>
-    @Query("SELECT * FROM game_table ORDER BY rating DESC")
-    fun getGamesByRating(): Flow<List<Game>>
-    @Query("SELECT * FROM game_table ORDER BY rating ASC")
-    fun getGamesByReverseRating(): Flow<List<Game>>
-    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY title ASC")
-    fun getAlphabetizedCompletedGames(isCompleted:Boolean): Flow<List<Game>>
-    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY title DESC")
-    fun getReverseAlphabetizedCompletedGames(isCompleted:Boolean): Flow<List<Game>>
-    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY rating DESC")
-    fun getCompletedGamesByRating(isCompleted:Boolean): Flow<List<Game>>
-    @Query("SELECT * FROM game_table WHERE completed=:isCompleted ORDER BY rating ASC")
-    fun getCompleteGamesByReverseRating(isCompleted:Boolean): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE title LIKE :keyword ORDER BY title ASC ")
+    fun getAlphabetizedGames(keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE title LIKE :keyword ORDER BY title DESC")
+    fun getReverseAlphabetizedGames(keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE title LIKE :keyword ORDER BY rating DESC")
+    fun getGamesByRating(keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE title LIKE :keyword ORDER BY rating ASC")
+    fun getGamesByReverseRating(keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted AND title LIKE :keyword ORDER BY title ASC")
+    fun getAlphabetizedCompletedGames(isCompleted:Boolean, keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted AND title LIKE :keyword ORDER BY title DESC")
+    fun getReverseAlphabetizedCompletedGames(isCompleted:Boolean, keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted AND title LIKE :keyword ORDER BY rating DESC")
+    fun getCompletedGamesByRating(isCompleted:Boolean, keyword:String): Flow<List<Game>>
+    @Query("SELECT * FROM game_table WHERE completed=:isCompleted AND title LIKE :keyword ORDER BY rating ASC")
+    fun getCompleteGamesByReverseRating(isCompleted:Boolean, keyword:String): Flow<List<Game>>
 
     //Get a single game with a given id
     @Query("SELECT * FROM game_table WHERE id=:id")

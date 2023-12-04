@@ -17,23 +17,28 @@ class GameRepository(private val gameDao: GameDao) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    val allGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedGames()
-    val allGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedGames()
-    val allGamesByRating: Flow<List<Game>> = gameDao.getGamesByRating()
-    val allGamesByReverseRating: Flow<List<Game>> = gameDao.getGamesByReverseRating()
-    val completedGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedCompletedGames(true)
-    val completedGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedCompletedGames(true)
-    val completedGamesByRating: Flow<List<Game>> = gameDao.getCompletedGamesByRating(true)
-    val completedGamesByReverseRating: Flow<List<Game>> = gameDao.getCompleteGamesByReverseRating(true)
-    val incompleteGamesAlphabetized: Flow<List<Game>> = gameDao.getAlphabetizedCompletedGames(false)
-    val incompleteGamesReverseAlphabetized: Flow<List<Game>> = gameDao.getReverseAlphabetizedCompletedGames(false)
-    val incompleteGamesByRating: Flow<List<Game>> = gameDao.getCompletedGamesByRating(false)
-    val incompleteGamesByReverseRating: Flow<List<Game>> = gameDao.getCompleteGamesByReverseRating(false)
     var loading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
-
-    fun setAllGames(mode:Int){
-
+    fun getFlow(sort:Int, filter:Int, keyword:String):Flow<List<Game>> {
+        when(sort){
+            0-> return if(filter==0)
+                    gameDao.getAlphabetizedGames("%$keyword%")
+                else
+                    gameDao.getAlphabetizedCompletedGames(filter==1, "%$keyword%")
+            1-> return if(filter==0)
+                    gameDao.getReverseAlphabetizedGames("%$keyword%")
+                else
+                    gameDao.getReverseAlphabetizedCompletedGames(filter==1, "%$keyword%")
+            2-> return if(filter==0)
+                    gameDao.getGamesByRating("%$keyword%")
+                else
+                    gameDao.getCompletedGamesByRating(filter==1, "%$keyword%")
+            3-> return if(filter==0)
+                    gameDao.getGamesByReverseRating("%$keyword%")
+                else
+                    gameDao.getCompleteGamesByReverseRating(filter==1, "%$keyword%")
+        }
+        return gameDao.getAlphabetizedGames("%$keyword%")
     }
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
