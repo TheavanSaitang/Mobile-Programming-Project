@@ -55,15 +55,17 @@ class GameRepository(private val gameDao: GameDao) {
     //to parse them
     suspend fun getSteamGames(userId: String) = withContext(Dispatchers.IO) {
         //flags loading to true
+
         loading.postValue(true)
         val request = Request.Builder()
             //https://api.steampowered.com/ISteamApps/GetAppList/v2
             .url("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$apiKey&steamid=$userId&format=json")
             .build()
+
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
             for ((name, value) in response.headers) {
-                println("$name: $value")
+                Log.d("HTTPRequest", "$name: $value")
             }
             parseSteamGames(response.body!!.string())
 
@@ -74,53 +76,49 @@ class GameRepository(private val gameDao: GameDao) {
     private suspend fun parseSteamGames(apiReturn: String){
         val gamesArray = JSONObject(apiReturn)
             .getJSONObject("response").getJSONArray("games")
-        val gamesToAdd = arrayListOf<Game>()
-        Log.d("Made", "It")
-        //getSteamGameInfo(gamesArray.getJSONObject(0).getString("appid"))
-        for(i in 0 until gamesArray.length())
-        {
-            //Log.d("Database", gamesArray.getJSONObject(i).get("appid").toString())
-            getSteamGameInfo(gamesArray.getJSONObject(i).getString("appid"))?.let {
-                gamesToAdd.add(
-                    it
-                )
-            }
+        val gamesToAdd = arrayListOf<String>()
+        for(i in 0 until gamesArray.length()){
+            gamesToAdd.add(gamesArray.getJSONObject(i).getString("appid"))
         }
-        for(i in 0 until gamesToAdd.size)
-        {
-            insert(gamesToAdd[i])
-        }
+        parseAndInsertSteamGamesInfo(getSteamGamesInfo(gamesToAdd.toTypedArray()))
         loading.postValue(false)
         Log.d("Test", "Made it!")
     }
 
     //gets appId and then calls steamAPI for more info, calls parseSteamGameInfo to parse it
-    private suspend fun getSteamGameInfo(appId:String): Game? {
+    private fun getSteamGamesInfo(appIds:Array<String>): String {
+        var url = "https://api.steampowered.com/ICommunityService/GetApps/v1/?key=$apiKey"
+        for((i, id) in appIds.withIndex())
+        {
+            url += "&appids%5B$i%5D=$id"
+        }
         val request = Request.Builder()
-            .url("https://api.steampowered.com/ICommunityService/GetApps/v1/?key=FCBCDE0D333F3FA53CE2A1AB19FCCE52&appids%5B0%5D=$appId")
+            .url(url)
             .build()
         client.newCall(request).execute().use {response ->
             if(!response.isSuccessful) throw IOException("Unexpected code $response")
             for((name, value) in response.headers) {
-                println("$name: $value")
+                Log.d("HTTPRequest", "$name: $value")
             }
-            return parseSteamGameInfo(response.body!!.string())
+            return response.body!!.string()//parseSteamGameInfo(response.body!!.string())
         }
     }
-
-    //parses game Info which is passed in, then adds the game to the database
-    private suspend fun parseSteamGameInfo(apiReturn: String): Game? {
-        val objectJSON = JSONObject(apiReturn)
-            .getJSONObject("response").getJSONArray("apps").getJSONObject(0)
-        val title = objectJSON.getString("name")
+    //parses JSONArray off appid's with associated title and icon
+    //inserts each value pair into the database with placeholder values for all unfilled fields
+    private suspend fun parseAndInsertSteamGamesInfo(apiReturn:String){
+        val objectJSON = JSONObject(apiReturn).getJSONObject("response").getJSONArray("apps")
+        var title = ""
         var icon = ""
-        if(objectJSON.has("icon")) {
-            icon = objectJSON.getString("icon")
+        for(i in 0 until objectJSON.length()){
+            title = objectJSON.getJSONObject(i).getString("name")
+
+            icon = if(objectJSON.getJSONObject(i).has("icon"))
+                objectJSON.getJSONObject(i).getString("icon")
+            else
+                ""
+            if(!checkGame(title))
+                insert(Game(null, title, false, 0L, "PC", icon, "", "", 0L, "", "", 0F))
         }
-        if(!checkGame(title)) {
-            return Game(null, title, false, 0, "PC", icon, "", "", 0, "", "", 0F)
-        }
-        return null
     }
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to

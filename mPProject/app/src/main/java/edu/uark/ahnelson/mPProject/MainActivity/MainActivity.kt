@@ -114,9 +114,12 @@ class MainActivity : AppCompatActivity(){
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        //MASSIVE observer function, used all over the MainActivity, unfortunately it has to be defined
-        //up here as to make everything else work
-
+        //observer function, switches the flow which the function is currently observing to that of
+        //another flow, defined by parameters passed in
+        //sort 0-3 are described in when(sortMode)
+        //filter 0 = allGames
+        //filter 1 = completedGames
+        //filter 2 = incompleteGames
         fun observe(sort:Int, filter:Int, keyword:String){
             when(sortMode){
                 0->fab.setImageResource(R.drawable.ic_sort_alphabetical_descending)
