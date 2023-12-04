@@ -35,7 +35,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 
-const val EXTRA_ID:String = "com.example.assignment2.GameActivity.EXTRA_ID"
+const val EXTRA_ID:String = "edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID"
 class GameActivity : AppCompatActivity() {
 
     private lateinit var imGame: ImageView
@@ -50,12 +50,8 @@ class GameActivity : AppCompatActivity() {
     private lateinit var etNotes: EditText
     private lateinit var imPictures: ImageView
 
-    private var initialArt: String = ""
-    private var initialPhotos: String = ""
-    private var art: String = ""
-    private var photos: String = ""
-
-    private var photoArtPath: String = ""
+    var photoPathArt: String = ""
+    var photoPathPics: String = ""
 
     private val gameViewModel: GameViewModel by viewModels {
         GameViewModelFactory((application as GamesApplication).repository,-1)
@@ -82,9 +78,17 @@ class GameActivity : AppCompatActivity() {
         }
         gameViewModel.curGame.observe(this) { game ->
             game?.let {
-                photoArtPath = game.art.toString()
-                Log.d("My BAAALS", game.art.toString())
-                initialArt = photoArtPath
+                photoPathArt = game.art.toString()
+                if(photoPathArt != ""){
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            Thread.sleep(200)
+                            withContext(Dispatchers.Main){
+                                setPic()
+                            }
+                        }
+                    }
+                }
                 etTitle.setText(game.title)
                 etSystem.setText(game.system)
                 etPublisher.setText(game.publisher)
@@ -106,19 +110,31 @@ class GameActivity : AppCompatActivity() {
                     cbComplete.setChecked(game.completed)
                     ratingBar.rating = game.rating!!
                     etNotes.setText(game.notes)
-                    if(game.photos != "") {
-                        imPictures.setImageBitmap(game.photos?.let { it1 -> getPic(it1, imPictures.width, imPictures.height) })
-                        initialPhotos = game.photos!!
-                    }
 
+                    }
+                photoPathPics = game.photos.toString()
+                if(photoPathPics != ""){
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            Thread.sleep(200)
+                            withContext(Dispatchers.Main){
+                                setPicPhotos()
+                            }
+                        }
+                    }
                 }
             }
+        }
 
-            imGame.setOnClickListener {
-                var photoPath = takeAPicture()
-//                var photoBitmap: Bitmap = getPic(photoPath,imGame.width, imGame.height)
-//                imGame.setImageBitmap(photoBitmap)
-            }
+        imGame.setOnClickListener {
+            takeAPicture()
+        }
+
+        imPictures.setOnClickListener {
+            takeAPicturePhotos()
+        }
+
+
 
             val saveButton = findViewById<Button>(R.id.buttonSave)
             saveButton.setOnClickListener {
@@ -138,12 +154,7 @@ class GameActivity : AppCompatActivity() {
                     } else {
                         pub = null
                     }
-                    if(art == initialArt) {
-                        art = ""
-                    }
-                    if(photos == initialPhotos) {
-                        photos = ""
-                    }
+
 
                     if (id == -1) {
                         gameViewModel.insert(
@@ -153,12 +164,12 @@ class GameActivity : AppCompatActivity() {
                                 cbComplete.isChecked,
                                 com,
                                 etSystem.text.toString(),
-                                art,
+                                photoPathArt,
                                 etDescription.text.toString(),
                                 etPublisher.text.toString(),
                                 pub,
                                 etNotes.text.toString(),
-                                photos,
+                                photoPathPics,
                                 ratingBar.rating
                             )
                         )
@@ -169,12 +180,12 @@ class GameActivity : AppCompatActivity() {
                             updatedGame.completed = cbComplete.isChecked
                             updatedGame.completedDate = com
                             updatedGame.system = etSystem.text.toString()
-                            updatedGame.art = art
+                            updatedGame.art = photoPathArt
                             updatedGame.description = etDescription.text.toString()
                             updatedGame.publisher = etPublisher.text.toString()
                             updatedGame.publishDate = pub
                             updatedGame.notes = etNotes.text.toString()
-                            updatedGame.photos = photos
+                            updatedGame.photos = photoPathPics
                             updatedGame.rating = ratingBar.rating
                             gameViewModel.update(updatedGame)
                         }
@@ -185,21 +196,9 @@ class GameActivity : AppCompatActivity() {
                 finish()
             }
         }
-    }
 
     override fun onResume() {
         super.onResume()
-        Log.d("Hey", "MyBalls!" + initialArt)
-        if(art != "") {
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    Thread.sleep(200)
-                    withContext(Dispatchers.Main){
-                        imGame.setImageBitmap(getPic(initialArt, imGame.width, imGame.height))
-                    }
-                }
-            }
-        }
     }
 
     val takePictureResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
@@ -208,29 +207,47 @@ class GameActivity : AppCompatActivity() {
             Log.d("MainActivity","Take Picture Activity Cancelled")
         }else{
             Log.d("MainActivity", "Picture Taken")
-            var photoBitmap: Bitmap = getPic(photoArtPath,imGame.width, imGame.height)
-            imGame.setImageBitmap(photoBitmap)
+            setPic()
         }
     }
 
-    private fun takeAPicture():String {
+    val takePictureResultLauncherPics = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+            result: ActivityResult ->
+        if(result.resultCode == Activity.RESULT_CANCELED){
+            Log.d("MainActivity","Take Picture Activity Cancelled")
+        }else{
+            Log.d("MainActivity", "Picture Taken")
+            setPicPhotos()
+        }
+    }
+
+    private fun takeAPicture() {
         val picIntent: Intent =  Intent().setAction(MediaStore.ACTION_IMAGE_CAPTURE)
         if(picIntent.resolveActivity(packageManager) != null){
             val filepath: String = createFilePath()
             val myFile: File = File(filepath)
+            photoPathArt = filepath
             val photoUri = FileProvider.getUriForFile(this,"edu.uark.ahnelson.mPProject.fileprovider",myFile)
             picIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
-            photoArtPath = filepath
             takePictureResultLauncher.launch(picIntent)
-            art = filepath
-            return filepath
         }
-        return ""
     }
+
+    private fun takeAPicturePhotos() {
+        val picIntent: Intent =  Intent().setAction(MediaStore.ACTION_IMAGE_CAPTURE)
+        if(picIntent.resolveActivity(packageManager) != null){
+            val filepath: String = createFilePath()
+            val myFile: File = File(filepath)
+            photoPathPics = filepath
+            val photoUri = FileProvider.getUriForFile(this,"edu.uark.ahnelson.mPProject.fileprovider",myFile)
+            picIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
+            takePictureResultLauncherPics.launch(picIntent)
+        }
+    }
+
     private fun createFilePath(): String {
         // Create an image file name
-        var timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
+        val imageFileName = "JPEG_" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + "_"
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
             imageFileName,  /* prefix */
@@ -240,22 +257,45 @@ class GameActivity : AppCompatActivity() {
         // Save a file: path for use with ACTION_VIEW intent
         return image.absolutePath
     }
-    private fun getPic(photoPath: String, w: Int, h: Int): Bitmap {
-        val targetW: Int = w
+
+    private fun setPic() {
+        val targetW: Int = imGame.getWidth()
 
         // Get the dimensions of the bitmap
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(photoPath, bmOptions)
+        BitmapFactory.decodeFile(photoPathArt, bmOptions)
         val photoW = bmOptions.outWidth
         val photoH = bmOptions.outHeight
-        val targetH: Int = h
+        val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
+        val targetH: Int = (targetW * photoRatio).roundToInt()
         // Determine how much to scale down the image
         val scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH))
+
+
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
-        Log.d("Hey", photoPath)
-        val bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
-        return bitmap
+        val bitmap = BitmapFactory.decodeFile(photoPathArt, bmOptions)
+        imGame.setImageBitmap(bitmap)
+    }
+
+    private fun setPicPhotos() {
+        val targetW: Int = imPictures.getWidth()
+
+        // Get the dimensions of the bitmap
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(photoPathPics, bmOptions)
+        val photoW = bmOptions.outWidth
+        val photoH = bmOptions.outHeight
+        val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
+        val targetH: Int = imPictures.getWidth()
+
+
+        bmOptions.inJustDecodeBounds = false
+        val bitmap = BitmapFactory.decodeFile(photoPathPics, bmOptions)
+        imPictures.setImageBitmap(bitmap)
     }
 }
+
+
