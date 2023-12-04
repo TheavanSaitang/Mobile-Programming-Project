@@ -19,7 +19,10 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
 
 
     val loading: MutableLiveData<Boolean> = repository.loading
-
+    var playerTitle: MutableLiveData<String> = repository.playerTitle
+    var playerIcon: MutableLiveData<String> = repository.playerIcon
+    var playerId: MutableLiveData<String> = repository.playerId
+    val transactionComplete: MutableLiveData<Boolean> = repository.transactionComplete
     fun getFlow(sort:Int, filter:Int, keyword:String):LiveData<List<Game>>{
         return repository.getFlow(sort, filter, keyword).asLiveData()
     }
@@ -35,9 +38,14 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
         }
     }
 
-    fun getSteamGames(userId: String) {
+    fun getSteamGames() {
         viewModelScope.launch {
-            repository.getSteamGames(userId)
+            repository.getSteamGames()
+        }
+    }
+    fun getSteamUser(userId: String) {
+        viewModelScope.launch {
+            repository.getSteamUser(userId)
         }
     }
 

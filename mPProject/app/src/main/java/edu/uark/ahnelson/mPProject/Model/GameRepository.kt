@@ -18,7 +18,10 @@ class GameRepository(private val gameDao: GameDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     var loading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-
+    var playerTitle: MutableLiveData<String> = MutableLiveData<String>()
+    var playerIcon: MutableLiveData<String> = MutableLiveData<String>()
+    var playerId: MutableLiveData<String> = MutableLiveData<String>()
+    var transactionComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     fun getFlow(sort:Int, filter:Int, keyword:String):Flow<List<Game>> {
         when(sort){
             0-> return if(filter==0)
@@ -51,15 +54,48 @@ class GameRepository(private val gameDao: GameDao) {
     }
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
+    suspend fun getSteamUser(userId:String): String = withContext(Dispatchers.IO){
+        transactionComplete.postValue(false)
+        val request = Request.Builder()
+            .url("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=$apiKey&steamids=$userId")
+            .build()
+        client.newCall(request).execute().use{response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            for ((name, value) in response.headers) {
+                Log.d("HTTPRequest", "$name: $value")
+            }
+            val apiReturn = response.body!!.string()
+            try{
+            playerTitle.postValue(
+                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                    .getJSONObject(0).getString("personaname")
+            )
+            playerIcon.postValue(
+                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                    .getJSONObject(0).getString("avatarfull")
+            )
+            playerId.postValue(
+                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                    .getJSONObject(0).getString("steamid")
+            )
+
+            }catch(e: Exception){
+                playerTitle.postValue("")
+                playerIcon.postValue("")
+                playerId.postValue("")
+            }
+            transactionComplete.postValue(true)}
+        return@withContext ""
+    }
     //connects to Steam API, gets all app id's from a user with a specified userId, then calls a function
     //to parse them
-    suspend fun getSteamGames(userId: String) = withContext(Dispatchers.IO) {
+    suspend fun getSteamGames() = withContext(Dispatchers.IO) {
         //flags loading to true
 
         loading.postValue(true)
         val request = Request.Builder()
             //https://api.steampowered.com/ISteamApps/GetAppList/v2
-            .url("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$apiKey&steamid=$userId&format=json")
+            .url("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$apiKey&steamid=${playerId.value}&format=json")
             .build()
 
         client.newCall(request).execute().use { response ->
@@ -107,8 +143,8 @@ class GameRepository(private val gameDao: GameDao) {
     //inserts each value pair into the database with placeholder values for all unfilled fields
     private suspend fun parseAndInsertSteamGamesInfo(apiReturn:String){
         val objectJSON = JSONObject(apiReturn).getJSONObject("response").getJSONArray("apps")
-        var title = ""
-        var icon = ""
+        var title:String
+        var icon:String
         for(i in 0 until objectJSON.length()){
             title = objectJSON.getJSONObject(i).getString("name")
 

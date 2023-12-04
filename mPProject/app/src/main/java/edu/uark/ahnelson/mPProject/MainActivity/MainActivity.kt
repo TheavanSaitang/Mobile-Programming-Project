@@ -29,10 +29,11 @@ import java.security.Key
 class MainActivity : AppCompatActivity(){
 
     //This instantiates the viewModel instance
-    private val gameListViewModel: GameListViewModel by viewModels {
+    val gameListViewModel: GameListViewModel by viewModels {
         GameListViewModelFactory((application as GamesApplication).repository)
     }
     private var filterMode: Int = 0
+    val steamFragment = SteamFragment()
     //onCreate override class
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +58,6 @@ class MainActivity : AppCompatActivity(){
                     }
 
                     R.id.importLibrary -> {
-                            val steamFragment = SteamFragment()
                             supportFragmentManager.commit {
                                 setCustomAnimations(
                                     R.anim.fade_in,
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(){
                                 R.anim.fade_in,
                                 R.anim.fade_out
                             )
-                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment]")
+                            replace(R.id.fragment_container_view, permissionFragment, "permissionFragment")
                             addToBackStack("permissionFragment")
                         }
                     }
@@ -202,10 +202,29 @@ class MainActivity : AppCompatActivity(){
                 supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
             }
         }
+        gameListViewModel.transactionComplete.observe(this){transactionComplete ->
+            if(transactionComplete){
+                val steamConfirmFragment: SteamConfirmFragment = SteamConfirmFragment()
+                supportFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                    )
+                    replace(R.id.fragment_container_view, steamConfirmFragment, "steamConfirmFragment")
+                    addToBackStack("steamConfirmFragment")
+                }
+            }
+        }
     }
     //called by SteamFragment, initiates any steam stuff
-    fun getSteamInfo(userId: String){
-        gameListViewModel.getSteamGames("76561198044143028")
+    fun getSteamUser(userId: String){
+        gameListViewModel.getSteamUser("76561198044143028")
+        //76561198044143028
+    }
+    fun getSteamGames(){
+        gameListViewModel.getSteamGames()
     }
     fun deleteAll(){
         gameListViewModel.deleteAll()
