@@ -1,12 +1,18 @@
 package edu.uark.ahnelson.mPProject.GameActivity
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.icu.text.DateFormat
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
@@ -20,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.loader.content.CursorLoader
 import edu.uark.ahnelson.mPProject.GamesApplication
 import edu.uark.ahnelson.mPProject.Model.Game
 import edu.uark.ahnelson.mPProject.R
@@ -28,11 +35,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.roundToInt
+import java.util.concurrent.Executors
 
 
 const val EXTRA_ID:String = "edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID"
@@ -52,6 +67,9 @@ class GameActivity : AppCompatActivity() {
 
     var photoPathArt: String = ""
     var photoPathPics: String = ""
+
+    val myExecutor = Executors.newSingleThreadExecutor()
+    val myHandler = Handler(Looper.getMainLooper())
 
     private val gameViewModel: GameViewModel by viewModels {
         GameViewModelFactory((application as GamesApplication).repository,-1)
@@ -79,12 +97,23 @@ class GameActivity : AppCompatActivity() {
         gameViewModel.curGame.observe(this) { game ->
             game?.let {
                 photoPathArt = game.art.toString()
+                if(game.art.toString() != "" && game.art.toString().substring(0, 1) == "h") {
+                    myExecutor.execute {
+                        var image: Bitmap? = fetchIcon(game.art.toString())
+                        myHandler.post {
+                            if (image != null) {
+                                saveImage(image)
+                            }
+                        }
+                    }
+                }
                 if(photoPathArt != ""){
                     lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             Thread.sleep(200)
                             withContext(Dispatchers.Main){
                                 setPic()
+                                Log.d("Hey", photoPathArt)
                             }
                         }
                     }
@@ -268,7 +297,7 @@ class GameActivity : AppCompatActivity() {
         val photoW = bmOptions.outWidth
         val photoH = bmOptions.outHeight
         val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
-        val targetH: Int = (targetW * photoRatio).roundToInt()
+        val targetH: Int = imGame.getHeight()
         // Determine how much to scale down the image
         val scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH))
 
@@ -289,12 +318,76 @@ class GameActivity : AppCompatActivity() {
         val photoW = bmOptions.outWidth
         val photoH = bmOptions.outHeight
         val photoRatio:Double = (photoH.toDouble())/(photoW.toDouble())
-        val targetH: Int = imPictures.getWidth()
+        val targetH: Int = imPictures.getHeight()
 
 
         bmOptions.inJustDecodeBounds = false
         val bitmap = BitmapFactory.decodeFile(photoPathPics, bmOptions)
         imPictures.setImageBitmap(bitmap)
+    }
+
+    private fun fetchIcon(webPath: String): Bitmap? {
+        val url: URL = stringToURL(webPath)!!
+        val connection: HttpURLConnection?
+        try {
+            connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+            val inputStream: InputStream = connection.inputStream
+            val bufferedInputStream = BufferedInputStream(inputStream)
+            return BitmapFactory.decodeStream(bufferedInputStream)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        }
+        return null
+    }
+
+    private fun stringToURL(string: String): URL? {
+        try {
+            return URL(string)
+        } catch (ex: MalformedURLException) {
+            ex.printStackTrace()
+        }
+        return null
+    }
+
+    private fun saveImage(bitmap: Bitmap?) {
+        val filename = "INTERNET" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + "_"
+        var fos: OutputStream? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            this.contentResolver?.also { resolver ->
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
+                val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                fos = imageUri?.let { resolver.openOutputStream(it) }
+                if (imageUri != null) {
+                    photoPathArt = getRealPathFromURI(imageUri).toString()
+                }
+            }
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val image = File(imagesDir, filename)
+            photoPathArt = image.absolutePath
+            fos = FileOutputStream(image)
+        }
+        fos?.use {
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+    }
+
+    private fun getRealPathFromURI(contentUri: Uri): String? {
+        val proj = arrayOf(MediaStore.Images.Media.DATA)
+        val loader = CursorLoader(this, contentUri, proj, null, null, null)
+        val cursor: Cursor? = loader.loadInBackground()
+        val columnIndex: Int = cursor
+            ?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            ?: return null
+        cursor.moveToFirst()
+        val result: String? = cursor.getString(columnIndex)
+        cursor.close()
+        return result
     }
 }
 
