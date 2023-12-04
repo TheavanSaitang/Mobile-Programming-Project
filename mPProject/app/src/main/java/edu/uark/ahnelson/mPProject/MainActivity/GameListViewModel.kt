@@ -16,36 +16,23 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-
-
+    val allGames: LiveData<List<Game>> = repository.allGames.asLiveData()
+    val completedGames: LiveData<List<Game>> = repository.completedGames.asLiveData()
+    val incompleteGames: LiveData<List<Game>> = repository.incompleteGames.asLiveData()
     val loading: MutableLiveData<Boolean> = repository.loading
-    var playerTitle: MutableLiveData<String> = repository.playerTitle
-    var playerIcon: MutableLiveData<String> = repository.playerIcon
-    var playerId: MutableLiveData<String> = repository.playerId
-    val transactionComplete: MutableLiveData<Boolean> = repository.transactionComplete
-    fun getFlow(sort:Int, filter:Int, keyword:String):LiveData<List<Game>>{
-        return repository.getFlow(sort, filter, keyword).asLiveData()
-    }
     fun update(game: Game) {
         viewModelScope.launch {
             repository.update(game)
         }
     }
-
     fun deleteAll() {
         viewModelScope.launch {
             repository.deleteAll()
         }
     }
-
-    fun getSteamGames() {
+    fun getSteamGames(userId: String) {
         viewModelScope.launch {
-            repository.getSteamGames()
-        }
-    }
-    fun getSteamUser(userId: String) {
-        viewModelScope.launch {
-            repository.getSteamUser(userId)
+            repository.getSteamGames(userId)
         }
     }
 

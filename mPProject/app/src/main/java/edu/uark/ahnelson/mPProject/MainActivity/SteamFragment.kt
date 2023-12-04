@@ -21,7 +21,6 @@ import androidx.fragment.app.commit
 
 
 class SteamFragment : Fragment() {
-    val root: View? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.fragment_steam_login, container, false)
@@ -50,7 +49,8 @@ class SteamFragment : Fragment() {
         }
         val buttonSubmit = root.findViewById<Button>(R.id.btnSubmit)
         buttonSubmit.setOnClickListener {
-            parentActivity.getSteamUser(inputUsername.text.toString())
+            parentActivity.getSteamInfo(inputUsername.text.toString())
+            root.startAnimation(exitAnimation)
         }
         return root
     }
