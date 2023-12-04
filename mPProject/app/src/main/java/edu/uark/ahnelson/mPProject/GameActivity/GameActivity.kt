@@ -98,6 +98,11 @@ class GameActivity : AppCompatActivity() {
                 }
             }
 
+            val scrapeButton = findViewById<Button>(R.id.scrapeButton)
+            scrapeButton.setOnClickListener{
+                gameViewModel.scrapeGameInfo(etTitle.text.toString())
+            }
+
             val saveButton = findViewById<Button>(R.id.buttonSave)
             saveButton.setOnClickListener {
                 CoroutineScope(SupervisorJob()).launch {

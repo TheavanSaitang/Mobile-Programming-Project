@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 import org.json.JSONObject
 
@@ -52,6 +54,8 @@ class GameRepository(private val gameDao: GameDao) {
     fun getGameNotLive(id:Int):Game{
         return gameDao.getGameNotLive(id)
     }
+
+    // API work
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
     suspend fun getSteamUser(userId:String): String = withContext(Dispatchers.IO){
@@ -157,7 +161,43 @@ class GameRepository(private val gameDao: GameDao) {
         }
     }
 
-    // By default Room runs suspend queries off the main thread, therefore, we don't need to
+    private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
+    private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
+    private val twitchAccessToken = "h6m4f0dm1yxgnrwxtjdpxtkd4z04qv"
+    suspend fun scrapeGameInfo(title:String) = withContext(Dispatchers.IO){
+        val mediaType = "text/plain".toMediaType()
+        Log.d("IGDB", "Starting call thread...")
+
+        // If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
+        //        val tatrec = Request.Builder()
+        //        .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
+        //            .post("".toRequestBody(mediaType))
+        //            .build()
+        //        client.newCall(tatrec).execute().use { response ->
+        //            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+        //            Log.d("GameRepository", "Request successful!")
+        //            response.body?.let { Log.d("GameRepository", it.string()) }
+        //        }
+
+        val body = "fields id,name;\nwhere name ~ \"$title\"*;\nsort rating desc; \nlimit 100;".toRequestBody(mediaType)
+        val request = Request.Builder()
+            .url("https://api.igdb.com/v4/games/")
+            .post(body)
+            .addHeader("Client-ID", twitchClientID)
+            .addHeader("Content-Type", "text/plain")
+            .addHeader("Authorization", "Bearer $twitchAccessToken")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            Log.d("IGDB","Request successful!")
+            for((name, value) in response.headers) {
+                println("$name: $value")
+            }
+            Log.d("IGDB",(response.body!!.string()))
+        }
+    }
+
+        // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
     @Suppress("RedundantSuspendModifier")
