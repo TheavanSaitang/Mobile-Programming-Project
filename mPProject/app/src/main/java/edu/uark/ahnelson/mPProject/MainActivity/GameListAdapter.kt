@@ -24,12 +24,12 @@ class GameListAdapter(val itemClicked: (id: Int) -> Unit)
 
         // Bind info to the MainActivity recyclerView and set up onClickListener
         current.id?.let {
-            holder.bind(it,current.title,current.system,current.rating)
+            holder.bind(current.title,current.system,current.rating)
         }
         holder.itemView.tag = current.id
         holder.itemView.setOnClickListener {
             val itemId = it.tag
-            Log.d("GameListAdapter","Item Clicked: " + itemId)
+            Log.d("GameListAdapter", "Item Clicked: $itemId")
             itemClicked(it.tag as Int)
         }
     }
@@ -40,7 +40,7 @@ class GameListAdapter(val itemClicked: (id: Int) -> Unit)
         private val ratingBar: RatingBar = itemView.findViewById(R.id.ratingBarShow)
 
         //
-        fun bind(id:Int, title: String?, system: String?, score: Float?) {
+        fun bind(title: String?, system: String?, score: Float?) {
             gameTitleView.text = title
             gameSystemView.text = system
             if (score != null) {

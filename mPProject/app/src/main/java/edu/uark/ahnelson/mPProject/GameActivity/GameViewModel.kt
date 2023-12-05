@@ -11,7 +11,7 @@ import kotlinx.coroutines.coroutineScope
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class GameViewModel(private val repository: GameRepository, private val id:Int) : ViewModel() {
+class GameViewModel(private val repository: GameRepository, id:Int) : ViewModel() {
 
     var curGame: LiveData<Game> = repository.getGame(id).asLiveData()
 
