@@ -42,6 +42,7 @@ class SteamConfirmFragment : Fragment() {
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
                 parentActivity.steamFragment.root?.startAnimation(parentActivity.steamFragment.exitAnimation)
+                parentActivity.steamFragment.mode = true
                 parentActivity.supportFragmentManager.popBackStack("steamConfirmFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
