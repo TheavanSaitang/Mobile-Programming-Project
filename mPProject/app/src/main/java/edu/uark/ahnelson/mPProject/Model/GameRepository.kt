@@ -192,7 +192,7 @@ class GameRepository(private val gameDao: GameDao) {
             else
                 ""
             if (!checkGame(title))
-                insert(Game(null, title, false, 0L, "PC", icon, "", "", 0L, "", "", 0F))
+                insert(Game(null, title, false, null, "PC", icon, "", "", 0L, "", "", 0F))
         }
     }
 
@@ -215,7 +215,7 @@ class GameRepository(private val gameDao: GameDao) {
         //        }
 
         val body =
-            "fields id,name,involved_companies.company.name,first_release_date,cover.url,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
+            "fields id,name,involved_companies.company.name,first_release_date,cover.image_id,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
                 mediaType
             )
         val request = Request.Builder()
@@ -237,7 +237,7 @@ class GameRepository(private val gameDao: GameDao) {
             val igdbID = arrayJSON.getJSONObject(0).getString("id")
             val date = arrayJSON.getJSONObject(0).getString("first_release_date")
             val dev = arrayJSON.getJSONObject(0).getJSONArray("involved_companies").getJSONObject(0).getJSONObject("company").getString("name")
-            val cover = "https:" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("url")
+            val cover = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("image_id") + ".jpg"
             val desc = arrayJSON.getJSONObject(0).getString("summary")
 
             Log.d("IGDB", "ID: $igdbID NAME: $igdbTitle DEV: $dev DATE: $date COVER: $cover DESC: $desc")

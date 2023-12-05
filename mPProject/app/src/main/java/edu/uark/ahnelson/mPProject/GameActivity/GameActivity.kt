@@ -176,13 +176,13 @@ class GameActivity : AppCompatActivity() {
                     var com: Long?
                     var pub: Long?
 
-                    if (etCompleteDate.text.toString() != "") {
+                    if (cbComplete.isChecked && etCompleteDate.text.toString() != "" && etCompleteDate.text.toString() != "-1") {
                         com = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etCompleteDate.text.toString())?.time
                     } else {
                         com = null
                     }
-                    if (etReleaseDate.text.toString() != "") {
+                    if (etReleaseDate.text.toString() != "" && etReleaseDate.text.toString() != "-1") {
                         pub = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etReleaseDate.text.toString())?.time
                     } else {
