@@ -48,7 +48,7 @@ class GameRepository(private val gameDao: GameDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     var loading: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    //var userInfoComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    var userInfoComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     var playerTitle: MutableLiveData<String> = MutableLiveData<String>()
     var playerIcon: MutableLiveData<String> = MutableLiveData<String>()
     var playerId: MutableLiveData<String> = MutableLiveData<String>()
@@ -91,7 +91,7 @@ class GameRepository(private val gameDao: GameDao) {
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
     suspend fun getSteamUser(userId: String): String = withContext(Dispatchers.IO) {
-        //userInfoComplete.postValue(false)
+        userInfoComplete.postValue(false)
         val request = Request.Builder()
             .url("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=$apiKey&steamids=$userId")
             .build()
@@ -120,7 +120,7 @@ class GameRepository(private val gameDao: GameDao) {
                 playerIcon.postValue("")
                 playerId.postValue("")
             }
-            //userInfoComplete.postValue(true)
+            userInfoComplete.postValue(true)
         }
         return@withContext ""
     }

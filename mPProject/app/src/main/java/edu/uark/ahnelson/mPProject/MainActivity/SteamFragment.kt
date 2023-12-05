@@ -16,6 +16,7 @@ import androidx.fragment.app.commit
 
 class SteamFragment : Fragment() {
     var mode:Boolean = false
+    var confirmMode: Boolean = false
     var root: View? = null
     var exitAnimation: Animation? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -23,6 +24,8 @@ class SteamFragment : Fragment() {
         root = inflater.inflate(R.layout.fragment_steam_login, container, false)
         val parentActivity = activity as MainActivity
         val inputUsername = root?.findViewById<EditText>(R.id.inputUsername)!!
+        confirmMode = false
+        mode = false
         exitAnimation = AnimationUtils.loadAnimation(activity, R.anim.fade_out)
         //defines exit animation
         //exitAnimation behavior
@@ -48,17 +51,21 @@ class SteamFragment : Fragment() {
         val buttonSubmit = root?.findViewById<Button>(R.id.btnSubmit)!!
         buttonSubmit.setOnClickListener {
             parentActivity.getSteamUser(inputUsername.text.toString())
-
-            val steamConfirmFragment = SteamConfirmFragment()
-            parentFragmentManager.commit {
-                setCustomAnimations(
-                    R.anim.fade_in,
-                    R.anim.fade_out,
-                    R.anim.fade_in,
-                    R.anim.fade_out
-                )
-                replace(R.id.fragment_container_view_2, steamConfirmFragment, "steamConfirmFragment")
-                addToBackStack("steamConfirmFragment")
+            confirmMode = true
+        }
+        parentActivity.gameListViewModel.userInfoComplete.observe(viewLifecycleOwner){it ->
+            if(it && confirmMode){
+                val steamConfirmFragment = SteamConfirmFragment()
+                parentFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                    )
+                    replace(R.id.fragment_container_view_2, steamConfirmFragment, "steamConfirmFragment")
+                    addToBackStack("steamConfirmFragment")
+                }
             }
 
         }

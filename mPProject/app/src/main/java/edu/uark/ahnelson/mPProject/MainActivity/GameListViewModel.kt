@@ -19,6 +19,7 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
 
 
     val loading: MutableLiveData<Boolean> = repository.loading
+    var userInfoComplete: MutableLiveData<Boolean> = repository.userInfoComplete
     var playerTitle: MutableLiveData<String> = repository.playerTitle
     var playerIcon: MutableLiveData<String> = repository.playerIcon
     fun getFlow(sort:Int, filter:Int, keyword:String):LiveData<List<Game>>{

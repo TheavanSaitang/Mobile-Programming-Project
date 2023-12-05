@@ -16,12 +16,22 @@
         android:background="@drawable/rounded_bg_color_primary_border"
         android:padding="@dimen/big_padding"
         >
-
+        <TextView
+            android:id="@+id/titleExtra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Is this your name?"
+            android:textAlignment="center"
+            android:textColor="@color/colorLightText"
+            android:textSize="26sp"
+            android:typeface="monospace"
+            android:padding="@dimen/small_padding"
+            android:background="@drawable/rounded_bg_color_primary"/>
         <TextView
             android:id="@+id/titleConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Is this your name?"
+            android:text=""
             android:textAlignment="center"
             android:textColor="@color/colorLightText"
             android:textSize="26sp"
