@@ -163,7 +163,7 @@ class GameActivity : AppCompatActivity() {
 
             val scrapeButton = findViewById<Button>(R.id.scrapeButton)
             scrapeButton.setOnClickListener{
-                gameViewModel.scrapeGameInfo(etTitle.text.toString(), id)
+                gameViewModel.scrapeGameInfo(etTitle.text.toString(), id, this)
             }
             val cancelButton = findViewById<Button>(R.id.buttonCancel)
             cancelButton.setOnClickListener {
@@ -175,13 +175,13 @@ class GameActivity : AppCompatActivity() {
                     var com: Long?
                     var pub: Long?
 
-                    if (cbComplete.isChecked && etCompleteDate.text.toString() != "" && etCompleteDate.text.toString() != "-1") {
+                    if (cbComplete.isChecked && etCompleteDate.text.toString() != "" && etCompleteDate.text.toString() != null) {
                         com = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etCompleteDate.text.toString())?.time
                     } else {
                         com = null
                     }
-                    if (etReleaseDate.text.toString() != "" && etReleaseDate.text.toString() != "-1") {
+                    if (etReleaseDate.text.toString() != "" && etReleaseDate.text.toString() != null) {
                         pub = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etReleaseDate.text.toString())?.time
                     } else {
