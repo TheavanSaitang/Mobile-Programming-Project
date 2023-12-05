@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedInputStream
 import java.io.File
@@ -48,27 +49,31 @@ class GameRepository(private val gameDao: GameDao) {
     var playerIcon: MutableLiveData<String> = MutableLiveData<String>()
     var playerId: MutableLiveData<String> = MutableLiveData<String>()
     var transactionComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    fun getFlow(sort:Int, filter:Int, keyword:String):Flow<List<Game>> {
-        when(sort){
-            0-> return if(filter==0)
-                    gameDao.getAlphabetizedGames("%$keyword%")
-                else
-                    gameDao.getAlphabetizedCompletedGames(filter==1, "%$keyword%")
-            1-> return if(filter==0)
-                    gameDao.getReverseAlphabetizedGames("%$keyword%")
-                else
-                    gameDao.getReverseAlphabetizedCompletedGames(filter==1, "%$keyword%")
-            2-> return if(filter==0)
-                    gameDao.getGamesByRating("%$keyword%")
-                else
-                    gameDao.getCompletedGamesByRating(filter==1, "%$keyword%")
-            3-> return if(filter==0)
-                    gameDao.getGamesByReverseRating("%$keyword%")
-                else
-                    gameDao.getCompleteGamesByReverseRating(filter==1, "%$keyword%")
+    fun getFlow(sort: Int, filter: Int, keyword: String): Flow<List<Game>> {
+        when (sort) {
+            0 -> return if (filter == 0)
+                gameDao.getAlphabetizedGames("%$keyword%")
+            else
+                gameDao.getAlphabetizedCompletedGames(filter == 1, "%$keyword%")
+
+            1 -> return if (filter == 0)
+                gameDao.getReverseAlphabetizedGames("%$keyword%")
+            else
+                gameDao.getReverseAlphabetizedCompletedGames(filter == 1, "%$keyword%")
+
+            2 -> return if (filter == 0)
+                gameDao.getGamesByRating("%$keyword%")
+            else
+                gameDao.getCompletedGamesByRating(filter == 1, "%$keyword%")
+
+            3 -> return if (filter == 0)
+                gameDao.getGamesByReverseRating("%$keyword%")
+            else
+                gameDao.getCompleteGamesByReverseRating(filter == 1, "%$keyword%")
         }
         return gameDao.getAlphabetizedGames("%$keyword%")
     }
+
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     fun getGame(id: Int): Flow<Game> {
@@ -82,39 +87,41 @@ class GameRepository(private val gameDao: GameDao) {
     // API work
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
-    suspend fun getSteamUser(userId:String): String = withContext(Dispatchers.IO){
+    suspend fun getSteamUser(userId: String): String = withContext(Dispatchers.IO) {
         transactionComplete.postValue(false)
         val request = Request.Builder()
             .url("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=$apiKey&steamids=$userId")
             .build()
-        client.newCall(request).execute().use{response ->
+        client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
             for ((name, value) in response.headers) {
                 Log.d("HTTPRequest", "$name: $value")
             }
             val apiReturn = response.body!!.string()
-            try{
-            playerTitle.postValue(
-                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
-                    .getJSONObject(0).getString("personaname")
-            )
-            playerIcon.postValue(
-                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
-                    .getJSONObject(0).getString("avatarfull")
-            )
-            playerId.postValue(
-                JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
-                    .getJSONObject(0).getString("steamid")
-            )
+            try {
+                playerTitle.postValue(
+                    JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                        .getJSONObject(0).getString("personaname")
+                )
+                playerIcon.postValue(
+                    JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                        .getJSONObject(0).getString("avatarfull")
+                )
+                playerId.postValue(
+                    JSONObject(apiReturn).getJSONObject("response").getJSONArray("players")
+                        .getJSONObject(0).getString("steamid")
+                )
 
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 playerTitle.postValue("")
                 playerIcon.postValue("")
                 playerId.postValue("")
             }
-            transactionComplete.postValue(true)}
+            transactionComplete.postValue(true)
+        }
         return@withContext ""
     }
+
     //connects to Steam API, gets all app id's from a user with a specified userId, then calls a function
     //to parse them
     suspend fun getSteamGames() = withContext(Dispatchers.IO) {
@@ -142,7 +149,7 @@ class GameRepository(private val gameDao: GameDao) {
         val gamesArray = JSONObject(apiReturn)
             .getJSONObject("response").getJSONArray("games")
         val gamesToAdd = arrayListOf<String>()
-        for(i in 0 until gamesArray.length()){
+        for (i in 0 until gamesArray.length()) {
             gamesToAdd.add(gamesArray.getJSONObject(i).getString("appid"))
         }
         parseAndInsertSteamGamesInfo(getSteamGamesInfo(gamesToAdd.toTypedArray()))
@@ -151,37 +158,37 @@ class GameRepository(private val gameDao: GameDao) {
     }
 
     //gets appId and then calls steamAPI for more info, calls parseSteamGameInfo to parse it
-    private fun getSteamGamesInfo(appIds:Array<String>): String {
+    private fun getSteamGamesInfo(appIds: Array<String>): String {
         var url = "https://api.steampowered.com/ICommunityService/GetApps/v1/?key=$apiKey"
-        for((i, id) in appIds.withIndex())
-        {
+        for ((i, id) in appIds.withIndex()) {
             url += "&appids%5B$i%5D=$id"
         }
         val request = Request.Builder()
             .url(url)
             .build()
-        client.newCall(request).execute().use {response ->
-            if(!response.isSuccessful) throw IOException("Unexpected code $response")
-            for((name, value) in response.headers) {
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            for ((name, value) in response.headers) {
                 Log.d("HTTPRequest", "$name: $value")
             }
             return response.body!!.string()//parseSteamGameInfo(response.body!!.string())
         }
     }
+
     //parses JSONArray off appid's with associated title and icon
     //inserts each value pair into the database with placeholder values for all unfilled fields
-    private suspend fun parseAndInsertSteamGamesInfo(apiReturn:String){
+    private suspend fun parseAndInsertSteamGamesInfo(apiReturn: String) {
         val objectJSON = JSONObject(apiReturn).getJSONObject("response").getJSONArray("apps")
-        var title:String
-        var icon:String
-        for(i in 0 until objectJSON.length()){
+        var title: String
+        var icon: String
+        for (i in 0 until objectJSON.length()) {
             title = objectJSON.getJSONObject(i).getString("name")
 
-            icon = if(objectJSON.getJSONObject(i).has("icon"))
+            icon = if (objectJSON.getJSONObject(i).has("icon"))
                 objectJSON.getJSONObject(i).getString("icon")
             else
                 ""
-            if(!checkGame(title))
+            if (!checkGame(title))
                 insert(Game(null, title, false, 0L, "PC", icon, "", "", 0L, "", "", 0F))
         }
     }
@@ -189,10 +196,10 @@ class GameRepository(private val gameDao: GameDao) {
     private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
     private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
     private val twitchAccessToken = "h6m4f0dm1yxgnrwxtjdpxtkd4z04qv"
-    suspend fun scrapeGameInfo(title:String) = withContext(Dispatchers.IO){
-        val mediaType = "text/plain".toMediaType()
-        Log.d("IGDB", "Starting call thread...")
 
+    val mediaType = "text/plain".toMediaType()
+    suspend fun scrapeGameInfo(title: String, id: Int) = withContext(Dispatchers.IO) {
+        Log.d("IGDB", "Starting call thread...")
         // If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
         //        val tatrec = Request.Builder()
         //        .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
@@ -204,7 +211,10 @@ class GameRepository(private val gameDao: GameDao) {
         //            response.body?.let { Log.d("GameRepository", it.string()) }
         //        }
 
-        val body = "fields id,name;\nwhere name ~ \"$title\"*;\nsort rating desc; \nlimit 100;".toRequestBody(mediaType)
+        val body =
+            "fields id,name,involved_companies.company.name,first_release_date,cover.url,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
+                mediaType
+            )
         val request = Request.Builder()
             .url("https://api.igdb.com/v4/games/")
             .post(body)
@@ -214,13 +224,32 @@ class GameRepository(private val gameDao: GameDao) {
             .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
-            Log.d("IGDB","Request successful!")
-            for((name, value) in response.headers) {
-                println("$name: $value")
-            }
-            Log.d("IGDB",(response.body!!.string()))
+            Log.d("IGDB", "Request successful!")
+//            Log.d("IGDB",(response.body!!.string()))
+
+            val arrayJSON = JSONArray(response.body!!.string())
+//            for (i in 0 until arrayJSON.length()){
+            // TODO: set up fragment to choose which game
+            val igdbTitle = arrayJSON.getJSONObject(0).getString("name") ?: title
+            val igdbID = arrayJSON.getJSONObject(0).getString("id")
+            val date = arrayJSON.getJSONObject(0).getString("first_release_date")
+            val dev = arrayJSON.getJSONObject(0).getJSONArray("involved_companies").getJSONObject(0).getJSONObject("company").getString("name")
+            val cover = "https:" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("url")
+            val desc = arrayJSON.getJSONObject(0).getString("summary")
+
+            Log.d("IGDB", "ID: $igdbID NAME: $igdbTitle DEV: $dev DATE: $date COVER: $cover DESC: $desc")
+            var gameData = getGameNotLive(id)
+            gameData.title = igdbTitle
+            gameData.publishDate = date.toLong()
+            gameData.publisher = dev
+            gameData.art = cover
+            gameData.description = desc
+
+            update(gameData)
         }
     }
+
+
 
     private fun makeUri(appid: String, icon: String): String {
         if (appid != "" && icon != "") {
@@ -263,5 +292,6 @@ class GameRepository(private val gameDao: GameDao) {
         return gameDao.getIfGameExists(title)
     }
 }
+
 
 

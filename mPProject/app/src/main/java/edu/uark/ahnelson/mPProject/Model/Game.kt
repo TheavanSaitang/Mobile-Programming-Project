@@ -22,7 +22,8 @@ import androidx.room.PrimaryKey
         - rating            (int?)
  */
 @Entity(tableName = "game_table")
-class Game(
+class
+Game(
 
     /*   Minimum Game Requirements   */
 

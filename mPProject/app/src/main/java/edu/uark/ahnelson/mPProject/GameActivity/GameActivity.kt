@@ -167,7 +167,7 @@ class GameActivity : AppCompatActivity() {
 
             val scrapeButton = findViewById<Button>(R.id.scrapeButton)
             scrapeButton.setOnClickListener{
-                gameViewModel.scrapeGameInfo(etTitle.text.toString())
+                gameViewModel.scrapeGameInfo(etTitle.text.toString(), id)
             }
 
             val saveButton = findViewById<Button>(R.id.buttonSave)

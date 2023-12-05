@@ -36,9 +36,9 @@ class GameViewModel(private val repository: GameRepository, private val id:Int) 
         }
     }
 
-    fun scrapeGameInfo(title: String) {
+    fun scrapeGameInfo(title: String, id: Int) {
         viewModelScope.launch {
-            repository.scrapeGameInfo(title)
+            repository.scrapeGameInfo(title, id)
         }
     }
 
