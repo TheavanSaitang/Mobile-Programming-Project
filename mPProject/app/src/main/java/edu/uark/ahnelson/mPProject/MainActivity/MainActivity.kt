@@ -214,21 +214,9 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
             }
         }
-        gameListViewModel.transactionComplete.observe(this){transactionComplete ->
-            if(transactionComplete){
-                val steamConfirmFragment: SteamConfirmFragment = SteamConfirmFragment()
-                supportFragmentManager.commit {
-                    setCustomAnimations(
-                        R.anim.fade_in,
-                        R.anim.fade_out,
-                        R.anim.fade_in,
-                        R.anim.fade_out
-                    )
-                    replace(R.id.fragment_container_view, steamConfirmFragment, "steamConfirmFragment")
-                    addToBackStack("steamConfirmFragment")
-                }
-            }
-        }
+        //TODO remove this after merge
+        //I got rid of transactionComplete entirely, after finding a better way to make steamFragment
+        //close, feel free to remove this in merge
     }
     //called by SteamFragment, initiates any steam stuff
     fun getSteamUser(userId: String){

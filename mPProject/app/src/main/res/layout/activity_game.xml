@@ -295,8 +295,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:background="@drawable/rounded_bg_color_accent_border"
-                    android:padding="@dimen/small_padding"
+                    android:background="@drawable/rounded_bg_color_primary_border"
+                    android:paddingHorizontal="@dimen/big_padding"
                     app:srcCompat="@android:drawable/ic_menu_gallery" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

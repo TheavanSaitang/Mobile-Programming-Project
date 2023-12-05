@@ -48,6 +48,9 @@ class GameRepository(private val gameDao: GameDao) {
     var playerTitle: MutableLiveData<String> = MutableLiveData<String>()
     var playerIcon: MutableLiveData<String> = MutableLiveData<String>()
     var playerId: MutableLiveData<String> = MutableLiveData<String>()
+    //TODO remove this after merge
+    //I got rid of transactionComplete entirely, after finding a better way to make steamFragment
+    //close, feel free to remove this in merge
     var transactionComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     fun getFlow(sort: Int, filter: Int, keyword: String): Flow<List<Game>> {
         when (sort) {
