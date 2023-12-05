@@ -122,18 +122,14 @@ class GameActivity : AppCompatActivity() {
                 etSystem.setText(game.system)
                 etPublisher.setText(game.publisher)
                 if (game.publishDate != null) {
-                    etReleaseDate.setText(
-                        java.text.DateFormat.getDateInstance(
-                            DateFormat.SHORT
-                        ).format(game.publishDate)
+                    val date = game.publishDate
+                    etReleaseDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date)
                     )
 
                     etDescription.setText(game.description)
                     if (game.completedDate != null) {
-                        etCompleteDate.setText(
-                            java.text.DateFormat.getDateInstance(
-                                DateFormat.SHORT
-                            ).format(game.completedDate)
+                        val date = game.completedDate
+                        etCompleteDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date)
                         )
                     }
                     cbComplete.setChecked(game.completed)

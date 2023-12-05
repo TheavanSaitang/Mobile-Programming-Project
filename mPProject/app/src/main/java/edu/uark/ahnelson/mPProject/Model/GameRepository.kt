@@ -198,24 +198,24 @@ class GameRepository(private val gameDao: GameDao) {
 
     private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
     private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
-    private val twitchAccessToken = "h6m4f0dm1yxgnrwxtjdpxtkd4z04qv"
+    private val twitchAccessToken = "ubhjlhg6179dy2t39ssk5m3mq8s9by"
 
     val mediaType = "text/plain".toMediaType()
     suspend fun scrapeGameInfo(title: String, id: Int) = withContext(Dispatchers.IO) {
         Log.d("IGDB", "Starting call thread...")
-        // If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
-        //        val tatrec = Request.Builder()
-        //        .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
-        //            .post("".toRequestBody(mediaType))
-        //            .build()
-        //        client.newCall(tatrec).execute().use { response ->
-        //            if (!response.isSuccessful) throw IOException("Unexpected code $response")
-        //            Log.d("GameRepository", "Request successful!")
-        //            response.body?.let { Log.d("GameRepository", it.string()) }
-        //        }
+//         If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
+//                val tatrec = Request.Builder()
+//                .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
+//                    .post("".toRequestBody(mediaType))
+//                    .build()
+//                client.newCall(tatrec).execute().use { response ->
+//                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+//                    Log.d("GameRepository", "Request successful!")
+//                    response.body?.let { Log.d("GameRepository", it.string()) }
+//                }
 
         val body =
-            "fields id,name,involved_companies.company.name,first_release_date,cover.image_id,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
+            "fields id,name,involved_companies.company.name,involved_companies.developer,first_release_date,cover.image_id,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
                 mediaType
             )
         val request = Request.Builder()
@@ -231,19 +231,25 @@ class GameRepository(private val gameDao: GameDao) {
 //            Log.d("IGDB",(response.body!!.string()))
 
             val arrayJSON = JSONArray(response.body!!.string())
-//            for (i in 0 until arrayJSON.length()){
             // TODO: set up fragment to choose which game
             val igdbTitle = arrayJSON.getJSONObject(0).getString("name") ?: title
             val igdbID = arrayJSON.getJSONObject(0).getString("id")
             val date = arrayJSON.getJSONObject(0).getString("first_release_date")
-            val dev = arrayJSON.getJSONObject(0).getJSONArray("involved_companies").getJSONObject(0).getJSONObject("company").getString("name")
+            val involvedCompanies = arrayJSON.getJSONObject(0).getJSONArray("involved_companies")
+            var dev = ""
+            for (i in 0 until involvedCompanies.length())
+                if (involvedCompanies.getJSONObject(i).getBoolean("developer")) {
+                    dev = involvedCompanies.getJSONObject(i).getJSONObject("company")
+                        .getString("name")
+                    break
+                }
             val cover = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("image_id") + ".jpg"
             val desc = arrayJSON.getJSONObject(0).getString("summary")
 
             Log.d("IGDB", "ID: $igdbID NAME: $igdbTitle DEV: $dev DATE: $date COVER: $cover DESC: $desc")
             var gameData = getGameNotLive(id)
             gameData.title = igdbTitle
-            gameData.publishDate = date.toLong()
+            gameData.publishDate = (date.toLong()*1000) + 100000000
             gameData.publisher = dev
             gameData.art = cover
             gameData.description = desc
