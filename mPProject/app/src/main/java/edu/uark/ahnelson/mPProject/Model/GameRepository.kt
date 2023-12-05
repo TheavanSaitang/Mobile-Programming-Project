@@ -240,6 +240,9 @@ class GameRepository(private val gameDao: GameDao) {
             var dev: String? = null
             var desc: String? = null
             var cover: String? = null
+
+            if(Looper.myLooper() == null)
+                Looper.prepare()
             try {
                 val arrayJSON = JSONArray(response.body!!.string())
                 // TODO: set up fragment to choose which game
@@ -253,7 +256,6 @@ class GameRepository(private val gameDao: GameDao) {
             }
             catch(e: Exception) {
                 Log.d("IGDB","No data found...")
-                Looper.prepare()
                 Toast.makeText(context, "No data found...", Toast.LENGTH_SHORT).show()
                 this.coroutineContext.cancel()
             }
@@ -267,7 +269,6 @@ class GameRepository(private val gameDao: GameDao) {
             }
             catch(e: Exception){
                 Log.d("IGDB","No data found...")
-                Looper.prepare()
                 Toast.makeText(context, "No developer found...", Toast.LENGTH_SHORT).show()
                 this.coroutineContext.cancel()
             }
@@ -283,6 +284,7 @@ class GameRepository(private val gameDao: GameDao) {
             gameData.description = desc
 
             update(gameData)
+            this.coroutineContext.cancel()
         }
     }
 
