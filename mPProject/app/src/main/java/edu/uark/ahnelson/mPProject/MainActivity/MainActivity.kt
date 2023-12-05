@@ -1,10 +1,16 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -25,8 +31,14 @@ import edu.uark.ahnelson.mPProject.GameActivity.EXTRA_ID
 import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
 import edu.uark.ahnelson.mPProject.Model.Game
 import java.security.Key
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
 
     //This instantiates the viewModel instance
     val gameListViewModel: GameListViewModel by viewModels {
@@ -202,21 +214,9 @@ class MainActivity : AppCompatActivity(){
                 supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
             }
         }
-        gameListViewModel.transactionComplete.observe(this){transactionComplete ->
-            if(transactionComplete){
-                val steamConfirmFragment: SteamConfirmFragment = SteamConfirmFragment()
-                supportFragmentManager.commit {
-                    setCustomAnimations(
-                        R.anim.fade_in,
-                        R.anim.fade_out,
-                        R.anim.fade_in,
-                        R.anim.fade_out
-                    )
-                    replace(R.id.fragment_container_view, steamConfirmFragment, "steamConfirmFragment")
-                    addToBackStack("steamConfirmFragment")
-                }
-            }
-        }
+        //TODO remove this after merge
+        //I got rid of transactionComplete entirely, after finding a better way to make steamFragment
+        //close, feel free to remove this in merge
     }
     //called by SteamFragment, initiates any steam stuff
     fun getSteamUser(userId: String){
@@ -245,4 +245,5 @@ class MainActivity : AppCompatActivity(){
             Log.d("MainActivity","Completed")
         }
     }
+
 }

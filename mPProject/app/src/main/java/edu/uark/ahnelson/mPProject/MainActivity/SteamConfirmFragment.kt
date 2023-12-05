@@ -38,8 +38,10 @@ class SteamConfirmFragment : Fragment() {
             override fun onAnimationRepeat(animation: Animation?) {
                 //no need to implement
             }
+            //starts steamFragment's exitAnimation
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
+                parentActivity.steamFragment.root?.startAnimation(parentActivity.steamFragment.exitAnimation)
                 parentActivity.supportFragmentManager.popBackStack("steamConfirmFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
@@ -54,8 +56,6 @@ class SteamConfirmFragment : Fragment() {
         }
 
         buttonYes.setOnClickListener {
-            parentActivity.steamFragment.root?.startAnimation(exitAnimation)
-            parentActivity.getSteamGames()
             root.startAnimation(exitAnimation)
         }
         //TODO I want, whenever this fragment is opened, for an imageView field to fill in

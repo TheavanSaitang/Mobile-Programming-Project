@@ -21,8 +21,9 @@ class GameListViewModel(private val repository: GameRepository) : ViewModel() {
     val loading: MutableLiveData<Boolean> = repository.loading
     var playerTitle: MutableLiveData<String> = repository.playerTitle
     var playerIcon: MutableLiveData<String> = repository.playerIcon
-    var playerId: MutableLiveData<String> = repository.playerId
-    val transactionComplete: MutableLiveData<Boolean> = repository.transactionComplete
+    //TODO remove this after merge
+    //I got rid of transactionComplete (and playerId here) as MutableLiveData entirely, after
+    //making it obselete
     fun getFlow(sort:Int, filter:Int, keyword:String):LiveData<List<Game>>{
         return repository.getFlow(sort, filter, keyword).asLiveData()
     }
