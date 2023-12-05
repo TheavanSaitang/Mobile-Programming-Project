@@ -22,6 +22,7 @@ import androidx.fragment.app.commit
 
 
 class SteamFragment : Fragment() {
+    var mode:Boolean = false
     var root: View? = null
     var exitAnimation: Animation? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,7 +40,7 @@ class SteamFragment : Fragment() {
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
                 parentActivity.supportFragmentManager.popBackStack("steamFragment", POP_BACK_STACK_INCLUSIVE)
-                parentActivity.getSteamGames()
+                if(mode) parentActivity.getSteamGames()
             }
 
             override fun onAnimationStart(animation: Animation?) {
@@ -65,9 +66,6 @@ class SteamFragment : Fragment() {
                 addToBackStack("steamConfirmFragment")
             }
             parentActivity.getSteamUser(inputUsername.text.toString())
-        }
-        fun exitAnimation(){
-
         }
         return root
     }

@@ -169,7 +169,10 @@ class GameActivity : AppCompatActivity() {
             scrapeButton.setOnClickListener{
                 gameViewModel.scrapeGameInfo(etTitle.text.toString(), id)
             }
-
+            val cancelButton = findViewById<Button>(R.id.buttonCancel)
+            cancelButton.setOnClickListener {
+                finish()
+            }
             val saveButton = findViewById<Button>(R.id.buttonSave)
             saveButton.setOnClickListener {
                 CoroutineScope(SupervisorJob()).launch {
