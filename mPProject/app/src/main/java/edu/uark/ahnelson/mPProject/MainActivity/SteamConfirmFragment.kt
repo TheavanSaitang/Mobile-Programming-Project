@@ -23,6 +23,7 @@ class SteamConfirmFragment : Fragment() {
         val buttonNo = root.findViewById<Button>(R.id.btnNo)
         val buttonYes = root.findViewById<Button>(R.id.btnYes)
         val titleConfirm: TextView = root.findViewById(R.id.titleConfirm)
+        var exit = false
         if(parentActivity.gameListViewModel.playerTitle.value == "") {
             titleConfirm.text = "INVALID USER ID"
             buttonYes.visibility = View.GONE
@@ -43,8 +44,10 @@ class SteamConfirmFragment : Fragment() {
             //starts steamFragment's exitAnimation
             //removes fragment from the backstack
             override fun onAnimationEnd(animation: Animation?){
-                parentActivity.steamFragment.root?.startAnimation(parentActivity.steamFragment.exitAnimation)
-                parentActivity.steamFragment.mode = true
+                if(exit) {
+                    parentActivity.steamFragment.root?.startAnimation(parentActivity.steamFragment.exitAnimation)
+                    parentActivity.steamFragment.mode = true
+                }
                 parentActivity.supportFragmentManager.popBackStack("steamConfirmFragment", POP_BACK_STACK_INCLUSIVE)
             }
 
@@ -59,6 +62,7 @@ class SteamConfirmFragment : Fragment() {
         }
 
         buttonYes.setOnClickListener {
+            exit = true
             root.startAnimation(exitAnimation)
         }
         //TODO I want, whenever this fragment is opened, for an imageView field to fill in

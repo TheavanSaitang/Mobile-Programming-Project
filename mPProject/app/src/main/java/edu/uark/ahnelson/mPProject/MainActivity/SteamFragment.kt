@@ -47,6 +47,8 @@ class SteamFragment : Fragment() {
         }
         val buttonSubmit = root?.findViewById<Button>(R.id.btnSubmit)!!
         buttonSubmit.setOnClickListener {
+            parentActivity.getSteamUser(inputUsername.text.toString())
+
             val steamConfirmFragment = SteamConfirmFragment()
             parentFragmentManager.commit {
                 setCustomAnimations(
@@ -58,7 +60,7 @@ class SteamFragment : Fragment() {
                 replace(R.id.fragment_container_view_2, steamConfirmFragment, "steamConfirmFragment")
                 addToBackStack("steamConfirmFragment")
             }
-            parentActivity.getSteamUser(inputUsername.text.toString())
+
         }
         return root
     }
