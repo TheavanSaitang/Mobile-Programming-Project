@@ -214,9 +214,6 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.popBackStack("loadingFragment", POP_BACK_STACK_INCLUSIVE)
             }
         }
-        //TODO remove this after merge
-        //I got rid of transactionComplete entirely, after finding a better way to make steamFragment
-        //close, feel free to remove this in merge
     }
     //called by SteamFragment, initiates any steam stuff
     fun getSteamUser(userId: String){

@@ -51,10 +51,6 @@ class GameRepository(private val gameDao: GameDao) {
     var playerTitle: MutableLiveData<String> = MutableLiveData<String>()
     var playerIcon: MutableLiveData<String> = MutableLiveData<String>()
     var playerId: MutableLiveData<String> = MutableLiveData<String>()
-    //TODO remove this after merge
-    //I got rid of transactionComplete entirely, after finding a better way to make steamFragment
-    //close, feel free to remove this in merge
-    var transactionComplete: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     fun getFlow(sort: Int, filter: Int, keyword: String): Flow<List<Game>> {
         when (sort) {
             0 -> return if (filter == 0)
@@ -94,7 +90,6 @@ class GameRepository(private val gameDao: GameDao) {
     private val client = OkHttpClient()
     private val apiKey = "FCBCDE0D333F3FA53CE2A1AB19FCCE52"
     suspend fun getSteamUser(userId: String): String = withContext(Dispatchers.IO) {
-        transactionComplete.postValue(false)
         val request = Request.Builder()
             .url("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=$apiKey&steamids=$userId")
             .build()
@@ -123,7 +118,6 @@ class GameRepository(private val gameDao: GameDao) {
                 playerIcon.postValue("")
                 playerId.postValue("")
             }
-            transactionComplete.postValue(true)
         }
         return@withContext ""
     }
