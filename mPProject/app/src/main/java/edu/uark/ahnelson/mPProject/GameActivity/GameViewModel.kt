@@ -1,5 +1,6 @@
 package edu.uark.ahnelson.mPProject.GameActivity
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -36,9 +37,9 @@ class GameViewModel(private val repository: GameRepository, private val id:Int) 
         }
     }
 
-    fun scrapeGameInfo(title: String, id: Int) {
+    fun scrapeGameInfo(title: String, id: Int, context: Context) {
         viewModelScope.launch {
-            repository.scrapeGameInfo(title, id)
+            repository.scrapeGameInfo(title, id, context)
         }
     }
 

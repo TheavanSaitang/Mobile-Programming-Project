@@ -122,18 +122,14 @@ class GameActivity : AppCompatActivity() {
                 etSystem.setText(game.system)
                 etPublisher.setText(game.publisher)
                 if (game.publishDate != null) {
-                    etReleaseDate.setText(
-                        java.text.DateFormat.getDateInstance(
-                            DateFormat.SHORT
-                        ).format(game.publishDate)
+                    val date = game.publishDate
+                    etReleaseDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date)
                     )
 
                     etDescription.setText(game.description)
                     if (game.completedDate != null) {
-                        etCompleteDate.setText(
-                            java.text.DateFormat.getDateInstance(
-                                DateFormat.SHORT
-                            ).format(game.completedDate)
+                        val date = game.completedDate
+                        etCompleteDate.setText(SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date)
                         )
                     }
                     cbComplete.setChecked(game.completed)
@@ -167,7 +163,7 @@ class GameActivity : AppCompatActivity() {
 
             val scrapeButton = findViewById<Button>(R.id.scrapeButton)
             scrapeButton.setOnClickListener{
-                gameViewModel.scrapeGameInfo(etTitle.text.toString(), id)
+                gameViewModel.scrapeGameInfo(etTitle.text.toString(), id, this)
             }
             val cancelButton = findViewById<Button>(R.id.buttonCancel)
             cancelButton.setOnClickListener {
@@ -179,13 +175,13 @@ class GameActivity : AppCompatActivity() {
                     var com: Long?
                     var pub: Long?
 
-                    if (etCompleteDate.text.toString() != "") {
+                    if (cbComplete.isChecked && etCompleteDate.text.toString() != "" && etCompleteDate.text.toString() != null) {
                         com = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etCompleteDate.text.toString())?.time
                     } else {
                         com = null
                     }
-                    if (etReleaseDate.text.toString() != "") {
+                    if (etReleaseDate.text.toString() != "" && etReleaseDate.text.toString() != null) {
                         pub = java.text.DateFormat.getDateInstance(DateFormat.SHORT)
                             .parse(etReleaseDate.text.toString())?.time
                     } else {

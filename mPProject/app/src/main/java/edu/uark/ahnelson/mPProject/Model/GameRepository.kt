@@ -2,6 +2,7 @@ package edu.uark.ahnelson.mPProject.Model
 
 import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -11,11 +12,13 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import edu.uark.ahnelson.mPProject.GameActivity.GameActivity
 import edu.uark.ahnelson.mPProject.MainActivity.MainActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -186,30 +189,30 @@ class GameRepository(private val gameDao: GameDao) {
             else
                 ""
             if (!checkGame(title))
-                insert(Game(null, title, false, 0L, "PC", icon, "", "", 0L, "", "", 0F))
+                insert(Game(null, title, false, null, "PC", icon, "", "", null, "", "", 0F))
         }
     }
 
     private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
     private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
-    private val twitchAccessToken = "h6m4f0dm1yxgnrwxtjdpxtkd4z04qv"
+    private val twitchAccessToken = "ubhjlhg6179dy2t39ssk5m3mq8s9by"
 
     val mediaType = "text/plain".toMediaType()
-    suspend fun scrapeGameInfo(title: String, id: Int) = withContext(Dispatchers.IO) {
+    suspend fun scrapeGameInfo(title: String, id: Int, context: Context) = withContext(Dispatchers.IO) {
         Log.d("IGDB", "Starting call thread...")
-        // If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
-        //        val tatrec = Request.Builder()
-        //        .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
-        //            .post("".toRequestBody(mediaType))
-        //            .build()
-        //        client.newCall(tatrec).execute().use { response ->
-        //            if (!response.isSuccessful) throw IOException("Unexpected code $response")
-        //            Log.d("GameRepository", "Request successful!")
-        //            response.body?.let { Log.d("GameRepository", it.string()) }
-        //        }
+//         If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
+//                val tatrec = Request.Builder()
+//                .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
+//                    .post("".toRequestBody(mediaType))
+//                    .build()
+//                client.newCall(tatrec).execute().use { response ->
+//                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+//                    Log.d("GameRepository", "Request successful!")
+//                    response.body?.let { Log.d("GameRepository", it.string()) }
+//                }
 
         val body =
-            "fields id,name,involved_companies.company.name,first_release_date,cover.url,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
+            "fields id,name,involved_companies.company.name,involved_companies.developer,first_release_date,cover.image_id,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(
                 mediaType
             )
         val request = Request.Builder()
@@ -224,20 +227,51 @@ class GameRepository(private val gameDao: GameDao) {
             Log.d("IGDB", "Request successful!")
 //            Log.d("IGDB",(response.body!!.string()))
 
-            val arrayJSON = JSONArray(response.body!!.string())
-//            for (i in 0 until arrayJSON.length()){
-            // TODO: set up fragment to choose which game
-            val igdbTitle = arrayJSON.getJSONObject(0).getString("name") ?: title
-            val igdbID = arrayJSON.getJSONObject(0).getString("id")
-            val date = arrayJSON.getJSONObject(0).getString("first_release_date")
-            val dev = arrayJSON.getJSONObject(0).getJSONArray("involved_companies").getJSONObject(0).getJSONObject("company").getString("name")
-            val cover = "https:" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("url")
-            val desc = arrayJSON.getJSONObject(0).getString("summary")
+            var igdbTitle = ""
+            var igdbID: String? = null
+            var date: String? = null
+            var involvedCompanies: JSONArray = JSONArray()
+            var dev: String? = null
+            var desc: String? = null
+            var cover: String? = null
+            try {
+                val arrayJSON = JSONArray(response.body!!.string())
+                // TODO: set up fragment to choose which game
+
+                igdbTitle = arrayJSON.getJSONObject(0).getString("name") ?: title
+                igdbID = arrayJSON.getJSONObject(0).getString("id")
+                date = arrayJSON.getJSONObject(0).getString("first_release_date")
+                involvedCompanies = arrayJSON.getJSONObject(0).getJSONArray("involved_companies")
+                cover = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + arrayJSON.getJSONObject(0).getJSONObject("cover").getString("image_id") + ".jpg"
+                desc = arrayJSON.getJSONObject(0).getString("summary")
+            }
+            catch(e: Exception) {
+                Log.d("IGDB","No data found...")
+                Looper.prepare()
+                Toast.makeText(context, "No data found...", Toast.LENGTH_SHORT).show()
+                this.coroutineContext.cancel()
+            }
+            try {
+                for (i in 0 until (involvedCompanies?.length()?:1))
+                    if (involvedCompanies.getJSONObject(i).getBoolean("developer")) {
+                        dev = involvedCompanies.getJSONObject(i).getJSONObject("company")
+                            .getString("name")
+                        break
+                    }
+            }
+            catch(e: Exception){
+                Log.d("IGDB","No data found...")
+                Looper.prepare()
+                Toast.makeText(context, "No developer found...", Toast.LENGTH_SHORT).show()
+                this.coroutineContext.cancel()
+            }
 
             Log.d("IGDB", "ID: $igdbID NAME: $igdbTitle DEV: $dev DATE: $date COVER: $cover DESC: $desc")
             var gameData = getGameNotLive(id)
             gameData.title = igdbTitle
-            gameData.publishDate = date.toLong()
+            if (date != null) {
+                gameData.publishDate = (date.toLong()*1000) + 100000000
+            }
             gameData.publisher = dev
             gameData.art = cover
             gameData.description = desc
