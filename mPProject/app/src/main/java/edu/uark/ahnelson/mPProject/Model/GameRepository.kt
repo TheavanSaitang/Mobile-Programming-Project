@@ -195,21 +195,21 @@ class GameRepository(private val gameDao: GameDao) {
 
     private val twitchAPIkey = "8tewxx9su460oqwdf9pu9kwvpy1lut"
     private val twitchClientID = "ea004to7ydnqixv12xvi2cq88nvkbo"
-    private val twitchAccessToken = "ubhjlhg6179dy2t39ssk5m3mq8s9by"
+    private val twitchAccessToken = "b4dd5ca1582ed52335b31960e05766fd22fa7cc4"
 
     val mediaType = "text/plain".toMediaType()
     suspend fun scrapeGameInfo(title: String, id: Int, context: Context) = withContext(Dispatchers.IO) {
         Log.d("IGDB", "Starting call thread...")
 //         If your scraping isnt working, try uncommenting this and check logcat for new twitchAccessToken. Copy/Paste that token above in twitchAccessToken.
-//                val tatrec = Request.Builder()
-//                .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
-//                    .post("".toRequestBody(mediaType))
-//                    .build()
-//                client.newCall(tatrec).execute().use { response ->
-//                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-//                    Log.d("GameRepository", "Request successful!")
-//                    response.body?.let { Log.d("GameRepository", it.string()) }
-//                }
+                val tatrec = Request.Builder()
+                .url("https://id.twitch.tv/oauth2/token?client_id=$twitchClientID&client_secret=$twitchAPIkey&grant_type=client_credentials")
+                    .post("".toRequestBody(mediaType))
+                    .build()
+                client.newCall(tatrec).execute().use { response ->
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    Log.d("GameRepository", "Request successful!")
+                    response.body?.let { Log.d("GameRepository", it.string()) }
+                }
 
         val body =
             "fields id,name,involved_companies.company.name,involved_companies.developer,first_release_date,cover.image_id,summary;\nwhere name = \"$title\";\nsort rating desc;".toRequestBody(

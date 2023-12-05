@@ -1,10 +1,6 @@
 package edu.uark.ahnelson.mPProject.MainActivity
 
-import android.animation.Animator
 import android.os.Bundle
-import android.os.Handler
-import android.transition.TransitionInflater
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import edu.uark.ahnelson.mPProject.R
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
 import androidx.fragment.app.commit
 
 
@@ -47,14 +40,14 @@ class SteamFragment : Fragment() {
                 //no need to implement
             }
         })
-        val buttonCancel:Button = root?.findViewById<Button>(R.id.btnCancel)!!
+        val buttonCancel:Button = root?.findViewById(R.id.btnCancel)!!
         buttonCancel.setOnClickListener{
             //runs exitAnimation, once animation ends the fragment is removed from the backstack
             root?.startAnimation(exitAnimation)
         }
         val buttonSubmit = root?.findViewById<Button>(R.id.btnSubmit)!!
         buttonSubmit.setOnClickListener {
-            val steamConfirmFragment: SteamConfirmFragment = SteamConfirmFragment()
+            val steamConfirmFragment = SteamConfirmFragment()
             parentFragmentManager.commit {
                 setCustomAnimations(
                     R.anim.fade_in,
